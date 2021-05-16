@@ -1,0 +1,17 @@
+.flexContainer {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.pane {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.pane > div {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}

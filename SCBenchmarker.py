@@ -1,5 +1,4 @@
-from src.ReplayParser import parser
-from src.Server import server
+from src import server
 
 if __name__ == "__main__":
     server.run_server()

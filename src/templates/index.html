@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>SC2 Benchmarker</title>
+    </head>
+    <body>
+        <h1>SC2 Benchmarker</h1>
+        <div class="flexContainer">
+            <div class="pane" id="bench-replay">
+                <div class="upload">
+                    Upload your own benchmark replay
+                </div>
+
+                <div id="proselector">
+                    Or select from the list of uploaded benchmarks
+                </div>
+            </div>
+            
+            <div class="pane" id="your-replay">
+                <div class="upload">
+                    Upload your own replay
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
