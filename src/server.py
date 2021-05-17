@@ -144,7 +144,7 @@ def analyze(hash: str):
     And returns the html page that displays the graphs.
 
     Parameters:
-    - filehash: the hash of user-uploaded file
+    - hash: the hash of user-uploaded file
         (uploaded file should have been renamed to its hash)
     """
     # TODO
