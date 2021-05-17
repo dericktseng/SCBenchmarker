@@ -2,6 +2,7 @@ __pycache__
 user-replays
 test-replays
 venv
+.venv
 
 ### VisualStudioCode ###
 .vscode/*
