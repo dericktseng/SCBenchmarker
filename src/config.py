@@ -1,4 +1,7 @@
+import os
+
 """=== Other configurations ==="""
+
 """All Folder paths are relative to THIS FILE config.py
 Either relative or absolute paths are accepted."""
 
@@ -15,8 +18,9 @@ DELTA_SECOND = 5
 
 
 """=== Flask configuration ==="""
-FLASK_ENV = 'development'
+
+SECRET_KEY = os.urandom(24)
+FLASK_ENV = 'development'  # development or production
 DEBUG = True
 TESTING = True
-SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 UPLOAD_FOLDER = USER_UPLOAD_FOLDER

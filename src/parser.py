@@ -1,6 +1,7 @@
 from zephyrus_sc2_parser import parse_replay
-from .constants import DELTA_SECOND
-from .constants import TICKS_PER_SECOND
+from .constants import \
+    DELTA_SECOND, \
+    TICKS_PER_SECOND
 
 
 def load_replay_file(path_to_replay: str):
