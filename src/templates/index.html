@@ -4,26 +4,42 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <title>SC2 Benchmarker</title>
     </head>
     <body>
         <h1>SC2 Benchmarker</h1>
-        <div class="flexContainer">
-            <div class="pane" id="bench-replay">
-                <div class="upload">
-                    Upload your own benchmark replay
-                </div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <form class="gridContainer" method="POST" action="" enctype="multipart/form-data">
+            <div class="upload" id="benchupload">
+                <label for="{{ bench_replay_tag }}">Upload benchmark replay:</label>
+                <p><input type="file" name="{{ bench_replay_tag }}" accept=".SC2Replay"></p>
+            </div>
 
-                <div id="proselector">
-                    Or select from the list of uploaded benchmarks
-                </div>
+            <div id="proselector">
+                <label for="{{ saved_replay_tag }}">Or select from the list of uploaded benchmarks:</label>
+                <p><select name="{{ saved_replay_tag }}">
+                    <option disabled selected value> -- select an option -- </option>
+                    {% for replay in saved_replays %}
+                        <option value="{{ replay }}">{{ replay }}</option>
+                    {% endfor %}
+                </select></p>
+            </div>
+
+            <div class="upload" id="ownupload">
+                <label for="{{ own_replay_tag }}">Upload your own replay</label>
+                <p><input type="file" name="{{ own_replay_tag }}" accept=".SC2Replay"></p>
             </div>
             
-            <div class="pane" id="your-replay">
-                <div class="upload">
-                    Upload your own replay
-                </div>
-            </div>
-        </div>
+            <div id="submitbutton"><input type="submit" value="Submit"></div>
+        </form>
     </body>
 </html>
