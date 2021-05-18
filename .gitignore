@@ -3,6 +3,7 @@ user-replays
 test-replays
 venv
 .venv
+.vim
 
 ### VisualStudioCode ###
 .vscode/*
