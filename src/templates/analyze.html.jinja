@@ -74,6 +74,7 @@
 
             function showMineralGraph(bVal, oVal) {
                 clearGraph('mineralChart', 'mineralChartContainer')
+                var ctx = document.getElementById('mineralChart');
 
                 // plots points and draws graph
                 labels = {{ bench_timestamps|tojson }};
