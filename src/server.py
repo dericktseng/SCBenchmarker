@@ -19,7 +19,7 @@ from .constants import \
     FLASK_CONFIG, \
     SESSION_FILENAME_DATA
 
-from .utils import valid_names, get_file_hash, dual_data
+from .utils import valid_names, get_file_hash
 from . import replayparser
 from zephyrus_sc2_parser.exceptions import PlayerCountError
 import os
@@ -149,9 +149,9 @@ def analyze(hash: str):
     bench_replay = None
     own_replay = None
     try:
-        bench_replay, own_replay = dual_data(
-            replayparser.load_replay_file,
-            filename_bench,
+        bench_replay = replayparser.load_replay_file(
+            filename_bench)
+        own_replay = replayparser.load_replay_file(
             filename_own)
     except PlayerCountError:
         flash("Only two player replays are supported!")
@@ -160,13 +160,13 @@ def analyze(hash: str):
         flash("Unable to read replay")
         return redirect(url_for('index'))
 
-    bench_player_names, own_player_names = dual_data(
+    bench_player_names, own_player_names = replayparser.dual_data(
         replayparser.get_player_names,
         bench_replay, own_replay)
-    bench_timestamps, own_timestamps = dual_data(
+    bench_timestamps, own_timestamps = replayparser.dual_data(
         replayparser.get_timeline_data,
         bench_replay, own_replay)
-    bench_minerals, own_minerals = dual_data(
+    bench_minerals, own_minerals = replayparser.dual_data(
         replayparser.get_mineral_data,
         bench_replay, own_replay)
 

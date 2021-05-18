@@ -22,4 +22,4 @@ FLASK_ENV = 'development'  # development or production
 DEBUG = True
 TESTING = True
 UPLOAD_FOLDER = USER_UPLOAD_FOLDER
-SERVER_NAME = 'localhost:9999'
+SERVER_NAME = '127.0.0.1:9999'

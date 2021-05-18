@@ -26,8 +26,8 @@
                 <label for="benchName">Benchmark Replay</label>
                 <p><select name="benchName" id="benchName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
-                    {% for name in bench_players %}
-                        <option value={{ bench_players[name] }}>{{ name }}</option>
+                    {% for pid in bench_players %}
+                        <option value={{ pid }}>{{ bench_players[pid] }}</option>
                     {% endfor %}
                 </select></p>
             </div>
@@ -36,8 +36,8 @@
                 <label for="ownName">Your Replay</label>
                 <p><select name="ownName" id="ownName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
-                    {% for name in own_players %}
-                        <option value={{ own_players[name] }}>{{ name }}</option>
+                    {% for pid in own_players %}
+                        <option value={{ pid }}>{{ own_players[pid] }}</option>
                     {% endfor %}
                 </select></p>
             </div>
@@ -48,6 +48,15 @@
         </div>
 
         <script type="text/javascript">
+            function clearGraph(id, containerId) {
+                var ctx = document.getElementById(id);
+                ctx.remove();
+                ctx = document.createElement("canvas")
+                ctx.id = id
+                var ctxContainer = document.getElementById(containerId)
+                ctxContainer.appendChild(ctx)
+            }
+
             /**
              * Takes in replay data for both bench replay and player replay.
              * Then spits out the graphs onto the canvas elements.
@@ -64,20 +73,15 @@
             }
 
             function showMineralGraph(bVal, oVal) {
-                var ctx = document.getElementById("mineralChart");
-                
-                // clear canvas
-                ctx.remove();
-                ctx = document.createElement("canvas")
-                ctx.id = "mineralChart"
-                var ctxContainer = document.getElementById("mineralChartContainer")
-                ctxContainer.appendChild(ctx)
+                clearGraph('mineralChart', 'mineralChartContainer')
 
                 // plots points and draws graph
                 labels = {{ bench_timestamps|tojson }};
                 labels = labels[bVal]
-                yval = {{ bench_minerals|tojson }};
-                yval = yval[bVal];
+                benchvals = {{ bench_minerals|tojson }};
+                benchvals = benchvals[bVal];
+                ownvals = {{ own_minerals|tojson }};
+                ownvals = ownvals[oVal];
 
                 var mineralChart = new Chart(ctx, {
                     type: 'line',
@@ -86,9 +90,15 @@
                         datasets: [
                             {
                                 label: 'Benchmark Mineral Rate',
-                                data: yval,
+                                data: benchvals,
                                 fill: false,
                                 borderColor: 'rgb(75, 192, 192)'
+                            },
+                            {
+                                label: 'Own Mineral Rate',
+                                data: ownvals,
+                                fill: false,
+                                borderColor: 'red'
                             }
                         ]
                     },

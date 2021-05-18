@@ -16,7 +16,3 @@ def valid_names(request):
         return False
     else:
         return True
-
-
-def dual_data(func, in1, in2):
-    return func(in1), func(in2)
