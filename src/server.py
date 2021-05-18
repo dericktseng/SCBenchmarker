@@ -162,19 +162,32 @@ def analyze(hash: str):
 
     bench_player_names, own_player_names = replayparser.dual_data(
         replayparser.get_player_names,
-        bench_replay, own_replay)
+        bench_replay, own_replay
+    )
     bench_timestamps, own_timestamps = replayparser.dual_data(
         replayparser.get_timeline_data,
-        bench_replay, own_replay)
+        bench_replay, own_replay
+    )
     bench_minerals, own_minerals = replayparser.dual_data(
         replayparser.get_mineral_data,
-        bench_replay, own_replay)
+        bench_replay, own_replay
+    )
+    bench_gas, own_gas = replayparser.dual_data(
+        replayparser.get_gas_data,
+        bench_replay, own_replay
+    )
+    bench_workers_produce, own_workers_produce = replayparser.dual_data(
+        replayparser.get_workers_produced,
+        bench_replay, own_replay
+    )
 
     return render_template(
         ANALYZE_HTML,
         bench_players=bench_player_names, own_players=own_player_names,
         bench_timestamps=bench_timestamps, own_timestamps=own_timestamps,
-        bench_minerals=bench_minerals, own_minerals=own_minerals)
+        bench_minerals=bench_minerals, own_minerals=own_minerals,
+        bench_gas=bench_gas, own_gas=own_gas,
+        bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce)
 
 
 def run_server():

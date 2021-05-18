@@ -6,8 +6,11 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
+        <script src="{{ url_for('static', filename='graphing.js') }}"></script>
+
         <!-- Uses Chart.JS: https://github.com/chartjs/Chart.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
+
         <title>SC2 Benchmarker</title>
     </head>
     <body>
@@ -42,21 +45,16 @@
                 </select></p>
             </div>
 
-            <div class="canvasContainer fullblock" id="mineralChartContainer">
-                <canvas id="mineralChart" class="graph"></canvas>
+            <div class="graphContainer fullblock" id="mineralChartContainer">
+                <canvas id="mineralChart"></canvas>
+            </div>
+
+            <div class="graphContainer fullblock" id="gasChartContainer">
+                <canvas id="gasChart"></canvas>
             </div>
         </div>
 
         <script type="text/javascript">
-            function clearGraph(id, containerId) {
-                var ctx = document.getElementById(id);
-                ctx.remove();
-                ctx = document.createElement("canvas")
-                ctx.id = id
-                var ctxContainer = document.getElementById(containerId)
-                ctxContainer.appendChild(ctx)
-            }
-
             /**
              * Takes in replay data for both bench replay and player replay.
              * Then spits out the graphs onto the canvas elements.
@@ -66,48 +64,20 @@
             function showGraphs(benchPlayerValue, ownPlayerValue) {
                 // both values must be selected
                 if (benchPlayerValue != "" && ownPlayerValue != "") {
-                    let bVal = benchPlayerValue;
-                    let oVal = ownPlayerValue;
-                    showMineralGraph(bVal, oVal);
+                    timestamps = {{ bench_timestamps|tojson }}[benchPlayerValue];
+                    
+                    // minerals
+                    benchMinerals = {{ bench_minerals|tojson }}[benchPlayerValue];
+                    ownMinerals = {{ own_minerals|tojson }}[ownPlayerValue];
+
+                    // gas
+                    benchGas = {{ bench_gas|tojson }}[benchPlayerValue];
+                    ownGas = {{ own_gas|tojson }}[ownPlayerValue];
+                    
+                    // these show functions are all contained in static/graphing.js
+                    showMineralGraph(timestamps, benchMinerals, ownMinerals);
+                    showGasGraph(timestamps, benchGas, ownGas);
                 }
-            }
-
-            function showMineralGraph(bVal, oVal) {
-                clearGraph('mineralChart', 'mineralChartContainer')
-                var ctx = document.getElementById('mineralChart');
-
-                // plots points and draws graph
-                labels = {{ bench_timestamps|tojson }};
-                labels = labels[bVal]
-                benchvals = {{ bench_minerals|tojson }};
-                benchvals = benchvals[bVal];
-                ownvals = {{ own_minerals|tojson }};
-                ownvals = ownvals[oVal];
-
-                var mineralChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Benchmark Mineral Rate',
-                                data: benchvals,
-                                fill: false,
-                                borderColor: 'rgb(75, 192, 192)'
-                            },
-                            {
-                                label: 'Own Mineral Rate',
-                                data: ownvals,
-                                fill: false,
-                                borderColor: 'red'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    },
-                });
             }
         </script>
     </body>

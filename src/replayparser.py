@@ -13,13 +13,20 @@ def load_replay_file(path_to_replay: str):
         tick=deltatick)
 
 
+def to_MM_SS(time_in_seconds):
+    time_in_seconds = round(time_in_seconds)
+    MM = str(time_in_seconds // 60)
+    SS = str(time_in_seconds % 60).zfill(2)
+    return "{}:{}".format(MM, SS)
+
+
 def get_timeline_data(replay):
     """ Returns the times from the replay for both players"""
     timeline = replay.timeline
     timeline_data = dict()
     for player in replay.players:
         timeline_data[player] = [
-            round(state[player]['gameloop'] / TICKS_PER_SECOND)
+            to_MM_SS(state[player]['gameloop'] / TICKS_PER_SECOND)
             for state in timeline
         ]
     return timeline_data
@@ -35,6 +42,30 @@ def get_mineral_data(replay):
             for state in timeline
         ]
     return mineral_data
+
+
+def get_gas_data(replay):
+    """ Returns the gas evolution over time for both players"""
+    timeline = replay.timeline
+    gas_data = dict()
+    for player in replay.players:
+        gas_data[player] = [
+            state[player]['resource_collection_rate']['gas']
+            for state in timeline
+        ]
+    return gas_data
+
+
+def get_workers_produced(replay):
+    """ Returns the total works produced at each increment of time """
+    timeline = replay.timeline
+    workers_data = dict()
+    for player in replay.players:
+        workers_data[player] = [
+            state[player]['workers_produced']
+            for state in timeline
+        ]
+    return workers_data
 
 
 def get_player_names(replay):
