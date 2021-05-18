@@ -15,14 +15,16 @@ from .constants import \
     BENCH_REPLAY_TAG, \
     SAVED_REPLAYS_TAG, \
     INDEX_HTML, \
+    ANALYZE_HTML, \
     FLASK_CONFIG, \
     SESSION_FILENAME_DATA
 
+from .utils import valid_names, get_file_hash, dual_data
+from . import replayparser
+from zephyrus_sc2_parser.exceptions import PlayerCountError
 import os
-import hashlib
 
 app = Flask(__name__)
-
 
 FILE_DIR = os.path.dirname(__file__)
 
@@ -33,12 +35,6 @@ saved_replay_folder_path = os.path.join(
 user_upload_folder_path = os.path.join(
     FILE_DIR,
     USER_UPLOAD_FOLDER)
-
-hashFunc = hashlib.md5()
-
-
-def get_file_hash(filedata):
-    return hashlib.md5(filedata).hexdigest()
 
 
 @app.route('/', methods=['GET'])
@@ -57,16 +53,6 @@ def index():
         saved_replay_tag=SAVED_REPLAYS_TAG,
         own_replay_tag=OWN_REPLAY_TAG,
         bench_replay_tag=BENCH_REPLAY_TAG)
-
-
-def valid_names(request):
-    """checks whether incoming data has correct names"""
-    if OWN_REPLAY_TAG not in request.files:
-        return False
-    elif BENCH_REPLAY_TAG not in request.files:
-        return False
-    else:
-        return True
 
 
 @app.route('/', methods=['POST'])
@@ -138,7 +124,7 @@ def upload_replays():
     return redirect(analyze_url)
 
 
-@app.route('/<hash>')
+@app.route('/<hash>', methods=['GET'])
 def analyze(hash: str):
     """analyzes the replay with the given filehash.
     And returns the html page that displays the graphs.
@@ -148,11 +134,47 @@ def analyze(hash: str):
         (uploaded file should have been renamed to its hash)
     """
     # TODO
-    filenames = session[SESSION_FILENAME_DATA]
-    filename_bench = filenames['filename_bench']
-    filename_own = filenames['filename_own']
+    filenames = session.get(SESSION_FILENAME_DATA, None)
+    filename_bench = None
+    filename_own = None
 
-    return filename_bench + " " + filename_own + " "
+    if filenames is not None:
+        filename_bench = filenames['filename_bench']
+        filename_own = filenames['filename_own']
+    else:
+        flash("Session Expired")
+        return redirect(url_for('index'))
+
+    # validates the replay files as an actual replay that can be parsed.
+    bench_replay = None
+    own_replay = None
+    try:
+        bench_replay, own_replay = dual_data(
+            replayparser.load_replay_file,
+            filename_bench,
+            filename_own)
+    except PlayerCountError:
+        flash("Only two player replays are supported!")
+        return redirect(url_for('index'))
+    except Exception:
+        flash("Unable to read replay")
+        return redirect(url_for('index'))
+
+    bench_player_names, own_player_names = dual_data(
+        replayparser.get_player_names,
+        bench_replay, own_replay)
+    bench_timestamps, own_timestamps = dual_data(
+        replayparser.get_timeline_data,
+        bench_replay, own_replay)
+    bench_minerals, own_minerals = dual_data(
+        replayparser.get_mineral_data,
+        bench_replay, own_replay)
+
+    return render_template(
+        ANALYZE_HTML,
+        bench_players=bench_player_names, own_players=own_player_names,
+        bench_timestamps=bench_timestamps, own_timestamps=own_timestamps,
+        bench_minerals=bench_minerals, own_minerals=own_minerals)
 
 
 def run_server():

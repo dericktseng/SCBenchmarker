@@ -1,16 +1,14 @@
 import os
 
-"""=== Other configurations ==="""
+"""=== Program configurations ==="""
 
-"""All Folder paths are relative to THIS FILE config.py
+"""All Folder paths are relative to THIS FILE (config.py)
 Either relative or absolute paths are accepted."""
 
-"""The folder that stores the professional benchmarks.
-All files in here CANNOT be deleted."""
+"""The folder that stores the professional benchmarks."""
 SAVED_REPLAY_FOLDER = '../test-replays'
 
-"""The folder that stores the user replays.
-All files in here CAN be deleted."""
+"""The folder that stores the user replays."""
 USER_UPLOAD_FOLDER = '../user-replays'
 
 """time between measuring a data point"""

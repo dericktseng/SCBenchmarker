@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+        <!-- Uses Chart.JS: https://github.com/chartjs/Chart.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
+        <title>SC2 Benchmarker</title>
+    </head>
+    <body>
+        <h1>SC2 Benchmarker</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <div class="gridContainer">
+            <div class="nameSelector">
+                <label for="benchName">Benchmark Replay</label>
+                <p><select name="benchName" id="benchName" onchange="showGraphs(benchName.value, ownName.value)">
+                    <option disabled selected value> -- select a player -- </option>
+                    {% for name in bench_players %}
+                        <option value={{ bench_players[name] }}>{{ name }}</option>
+                    {% endfor %}
+                </select></p>
+            </div>
+
+            <div class="nameSelector">
+                <label for="ownName">Your Replay</label>
+                <p><select name="ownName" id="ownName" onchange="showGraphs(benchName.value, ownName.value)">
+                    <option disabled selected value> -- select a player -- </option>
+                    {% for name in own_players %}
+                        <option value={{ own_players[name] }}>{{ name }}</option>
+                    {% endfor %}
+                </select></p>
+            </div>
+
+            <div class="canvasContainer fullblock" id="mineralChartContainer">
+                <canvas id="mineralChart" class="graph"></canvas>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            /**
+             * Takes in replay data for both bench replay and player replay.
+             * Then spits out the graphs onto the canvas elements.
+             * @param {int} benchPlayerValue - 1 for player1, 2 for player2
+             * @param {int} ownPlayerValue - 1 for player1, 2 for player2
+             */
+            function showGraphs(benchPlayerValue, ownPlayerValue) {
+                // both values must be selected
+                if (benchPlayerValue != "" && ownPlayerValue != "") {
+                    let bVal = benchPlayerValue;
+                    let oVal = ownPlayerValue;
+                    showMineralGraph(bVal, oVal);
+                }
+            }
+
+            function showMineralGraph(bVal, oVal) {
+                var ctx = document.getElementById("mineralChart");
+                
+                // clear canvas
+                ctx.remove();
+                ctx = document.createElement("canvas")
+                ctx.id = "mineralChart"
+                var ctxContainer = document.getElementById("mineralChartContainer")
+                ctxContainer.appendChild(ctx)
+
+                // plots points and draws graph
+                labels = {{ bench_timestamps|tojson }};
+                labels = labels[bVal]
+                yval = {{ bench_minerals|tojson }};
+                yval = yval[bVal];
+
+                var mineralChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Benchmark Mineral Rate',
+                                data: yval,
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    },
+                });
+            }
+        </script>
+    </body>
+</html>
