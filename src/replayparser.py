@@ -57,7 +57,7 @@ def get_gas_data(replay):
 
 
 def get_workers_produced(replay):
-    """ Returns the total works produced at each increment of time """
+    """ Returns the total workers produced at each increment of time """
     timeline = replay.timeline
     workers_data = dict()
     for player in replay.players:
@@ -66,6 +66,18 @@ def get_workers_produced(replay):
             for state in timeline
         ]
     return workers_data
+
+
+def get_total_supply(replay):
+    """ Returns the timeline total supply of both players """
+    timeline = replay.timeline
+    supply_data = dict()
+    for player in replay.players:
+        supply_data[player] = [
+            state[player]['supply']
+            for state in timeline
+        ]
+    return supply_data
 
 
 def get_player_names(replay):

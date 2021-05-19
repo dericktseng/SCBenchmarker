@@ -160,6 +160,7 @@ def analyze(hash: str):
         flash("Unable to read replay")
         return redirect(url_for('index'))
 
+    # data for graphing (JSON format)
     bench_player_names, own_player_names = replayparser.dual_data(
         replayparser.get_player_names,
         bench_replay, own_replay
@@ -180,6 +181,10 @@ def analyze(hash: str):
         replayparser.get_workers_produced,
         bench_replay, own_replay
     )
+    bench_supply, own_supply = replayparser.dual_data(
+        replayparser.get_total_supply,
+        bench_replay, own_replay
+    )
 
     return render_template(
         ANALYZE_HTML,
@@ -187,7 +192,8 @@ def analyze(hash: str):
         bench_timestamps=bench_timestamps, own_timestamps=own_timestamps,
         bench_minerals=bench_minerals, own_minerals=own_minerals,
         bench_gas=bench_gas, own_gas=own_gas,
-        bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce)
+        bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce,
+        bench_supply=bench_supply, own_supply=own_supply)
 
 
 def run_server():

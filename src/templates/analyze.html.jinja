@@ -45,16 +45,20 @@
                 </select></p>
             </div>
 
-            <div class="graphContainer fullblock" id="mineralChartContainer">
+            <div class="graphContainer fullblock income" id="mineralChartContainer">
                 <canvas id="mineralChart"></canvas>
             </div>
 
-            <div class="graphContainer fullblock" id="gasChartContainer">
+            <div class="graphContainer fullblock income" id="gasChartContainer">
                 <canvas id="gasChart"></canvas>
             </div>
 
-            <div class="graphContainer fullblock" id="workerChartContainer">
+            <div class="graphContainer fullblock income" id="workerChartContainer">
                 <canvas id="workerChart"></canvas>
+            </div>
+
+            <div class="graphContainer fullblock supply" id="supplyChartContainer">
+                <canvas id="supplyChart"></canvas>
             </div>
         </div>
 
@@ -79,13 +83,18 @@
                     var ownGas = {{ own_gas|tojson }}[ownPlayerValue];
 
                     // workers built
-                    var benchWorkers = {{ bench_workers_produce|tojson }}[benchPlayerValue]
-                    var ownWorkers = {{ own_workers_produce|tojson }}[ownPlayerValue]
+                    var benchWorkers = {{ bench_workers_produce|tojson }}[benchPlayerValue];
+                    var ownWorkers = {{ own_workers_produce|tojson }}[ownPlayerValue];
+
+                    // supply
+                    var benchSupply = {{ bench_supply|tojson }}[benchPlayerValue];
+                    var ownSupply = {{ own_supply|tojson }}[ownPlayerValue];
                     
                     // these show functions are all contained in static/graphing.js
                     showMineralGraph(timestamps, benchMinerals, ownMinerals);
                     showGasGraph(timestamps, benchGas, ownGas);
                     showWorkersGraph(timestamps, benchWorkers, ownWorkers);
+                    showSupplyGraph(timestamps, benchSupply, ownSupply);
                 }
             }
         </script>

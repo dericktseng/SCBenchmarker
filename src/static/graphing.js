@@ -100,6 +100,16 @@ function showWorkersGraph(timestamps, bench, own) {
         timestamps,
         bench,
         own,
-        "Workers created",
+        "Workers Created",
+        canvas);
+}
+
+function showSupplyGraph(timestamps, bench, own) {
+    var canvas = document.getElementById('supplyChart');
+    generateGraph(
+        timestamps,
+        bench,
+        own,
+        "Supply",
         canvas);
 }
