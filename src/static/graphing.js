@@ -4,14 +4,17 @@ var own_color = "#b12abf";
 /**
  * clears the graph on the canvas
  * @param {HTMLCanvasElement} canvas - canvas to clear
+ * @returns context of new canvas to draw on.
  */
 function clearGraph(canvas) {
     var id = canvas.id;
+    var canvasClass = canvas.classList;
     var container = canvas.parentElement;
     canvas.remove();
 
     var newCanvas = document.createElement("canvas");
     newCanvas.id = id;
+    newCanvas.classList = canvasClass;
     container.appendChild(newCanvas);
 
     return newCanvas.getContext("2d");
@@ -33,14 +36,12 @@ function generateGraph(timestamps, bench, own, title, canvas) {
         type: 'line',
         data: {
             labels: timestamps,
-            datasets: [
-                {
+            datasets: [{
                     label: 'Benchmark ' + title,
                     data: bench,
                     fill: false,
                     borderColor: benchmark_color
-                },
-                {
+                }, {
                     label: 'Own ' + title,
                     data: own,
                     fill: false,
@@ -50,7 +51,25 @@ function generateGraph(timestamps, bench, own, title, canvas) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            showTooltips: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'index',
+                intersect: false
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            }
         }
     });
 }
@@ -72,5 +91,15 @@ function showGasGraph(timestamps, bench, own) {
         bench,
         own,
         "Gas Rate",
+        canvas);
+}
+
+function showWorkersGraph(timestamps, bench, own) {
+    var canvas = document.getElementById('workerChart');
+    generateGraph(
+        timestamps,
+        bench,
+        own,
+        "Workers created",
         canvas);
 }

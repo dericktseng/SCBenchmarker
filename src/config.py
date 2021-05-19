@@ -12,7 +12,7 @@ SAVED_REPLAY_FOLDER = '../test-replays'
 USER_UPLOAD_FOLDER = '../user-replays'
 
 """time between measuring a data point"""
-DELTA_SECOND = 5
+DELTA_SECOND = 3
 
 
 """=== Flask configuration ==="""

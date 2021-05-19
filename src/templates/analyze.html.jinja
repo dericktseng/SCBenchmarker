@@ -52,6 +52,10 @@
             <div class="graphContainer fullblock" id="gasChartContainer">
                 <canvas id="gasChart"></canvas>
             </div>
+
+            <div class="graphContainer fullblock" id="workerChartContainer">
+                <canvas id="workerChart"></canvas>
+            </div>
         </div>
 
         <script type="text/javascript">
@@ -64,19 +68,24 @@
             function showGraphs(benchPlayerValue, ownPlayerValue) {
                 // both values must be selected
                 if (benchPlayerValue != "" && ownPlayerValue != "") {
-                    timestamps = {{ bench_timestamps|tojson }}[benchPlayerValue];
+                    var timestamps = {{ bench_timestamps|tojson }}[benchPlayerValue];
                     
                     // minerals
-                    benchMinerals = {{ bench_minerals|tojson }}[benchPlayerValue];
+                    var benchMinerals = {{ bench_minerals|tojson }}[benchPlayerValue];
                     ownMinerals = {{ own_minerals|tojson }}[ownPlayerValue];
 
                     // gas
-                    benchGas = {{ bench_gas|tojson }}[benchPlayerValue];
-                    ownGas = {{ own_gas|tojson }}[ownPlayerValue];
+                    var benchGas = {{ bench_gas|tojson }}[benchPlayerValue];
+                    var ownGas = {{ own_gas|tojson }}[ownPlayerValue];
+
+                    // workers built
+                    var benchWorkers = {{ bench_workers_produce|tojson }}[benchPlayerValue]
+                    var ownWorkers = {{ own_workers_produce|tojson }}[ownPlayerValue]
                     
                     // these show functions are all contained in static/graphing.js
                     showMineralGraph(timestamps, benchMinerals, ownMinerals);
                     showGasGraph(timestamps, benchGas, ownGas);
+                    showWorkersGraph(timestamps, benchWorkers, ownWorkers);
                 }
             }
         </script>
