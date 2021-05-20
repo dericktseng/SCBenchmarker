@@ -40,6 +40,13 @@ h1 {
     padding: 0;
 }
 
+.build {
+    display: grid;
+    grid-template-columns: 1fr 99fr;
+    row-gap: 1em;
+    column-gap: 1em;
+}
+
 #benchupload {
     grid-column: 1;
     grid-row: 1;

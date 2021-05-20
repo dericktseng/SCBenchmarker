@@ -113,3 +113,63 @@ function showSupplyGraph(timestamps, bench, own) {
         "Supply",
         canvas);
 }
+
+/**
+ * 
+ * @param {HTMLElement} target target to display on.
+ * @param {Array[string]} timestamps timestamps
+ * @param {Array[Dict]} buildList list of buildings, units, upgrades at every time.
+ */
+function displayBuild(target, timestamps, buildList) {
+    // clears the frame for drawing
+    target.innerText = '';
+
+    // dictionary of units, buildings, upgrades, entries at a timestamp
+    var prevBuildListItem = {};
+    for(i = 0; i < timestamps.length; i++) {
+        // dictionary of units, buildings, upgrades, entries at a timestamp
+        var currBuildListItem = buildList[i];
+        
+        // whether timestamp has something changing in the build
+        var validTime = false;
+
+        var buildBlock = document.createElement("div");
+        buildBlock.className += 'buildBlock';
+
+        for(buildEntry in currBuildListItem) {
+            if (buildEntry in prevBuildListItem) {
+                var diff = currBuildListItem[buildEntry] - prevBuildListItem[buildEntry];
+                if (diff > 0) {
+                    var buildElement = document.createElement("div");
+                    buildElement.innerText = buildEntry + ": " + diff;
+                    buildBlock.appendChild(buildElement);
+                    validTime = true;
+                }
+            } else {
+                var buildElement = document.createElement("div");
+                buildElement.innerText = buildEntry + ": " + currBuildListItem[buildEntry];
+                buildBlock.appendChild(buildElement);
+                validTime = true;
+            }
+        }
+
+        if (validTime) {
+            var timestampElement = document.createElement("div");
+            timestampElement.innerText = timestamps[i];
+            target.appendChild(timestampElement);
+            target.appendChild(buildBlock);
+        }
+
+        prevBuildListItem = currBuildListItem;
+        validTime = false;
+    }
+}
+
+function showBuild(timestamps, bench, own) {
+    var benchElement = document.getElementById('benchmarkBuild');
+    var ownElement = document.getElementById('ownBuild');
+
+    // all of timestamp, bench, and own should have the same length:
+    displayBuild(benchElement, timestamps, bench);
+    displayBuild(ownElement, timestamps, own);
+}

@@ -1,11 +1,11 @@
 from zephyrus_sc2_parser import parse_replay
-from .constants import TICKS_PER_SECOND
+from .constants import TICKS_PER_SECOND, ALIASES
 from .config import DELTA_SECOND
+from . import utils
 
 
 def load_replay_file(path_to_replay: str):
-    """ Loads the replay file defined by path_to_replay
-    """
+    """ Loads the replay file defined by path_to_replay."""
     deltatick = DELTA_SECOND * TICKS_PER_SECOND
     return parse_replay(
         path_to_replay,
@@ -15,7 +15,7 @@ def load_replay_file(path_to_replay: str):
 
 def to_MM_SS(time_in_seconds):
     time_in_seconds = round(time_in_seconds)
-    MM = str(time_in_seconds // 60)
+    MM = str(time_in_seconds // 60).zfill(2)
     SS = str(time_in_seconds % 60).zfill(2)
     return "{}:{}".format(MM, SS)
 
@@ -80,8 +80,94 @@ def get_total_supply(replay):
     return supply_data
 
 
+def get_macro_spells(replay):
+    # TODO
+    return None
+
+
+def get_build_order(replay):
+    """ Returns the build order for both players of the replay.
+    This contains data on the units constructed (alive + dead),
+    Upgrades, and buildings constructed (alive + dead).
+
+    format returned:
+    {
+        1: [{
+                "Probe": 5,
+                "Stalker": 6,
+                "Nexus": 1,
+                "CyberneticsCore": 1,
+                "upgrades": ["warpgate", "armor1"]
+            }, {
+                "Probe": 6,
+                "Stalker": 7,
+                "Nexus": 2,
+                "CyberneticsCore": 1,
+                "upgrades": ["warpgate", "armor1"]
+            },
+            ...
+            ],
+        2: {
+            ...
+        }
+    }
+    """
+    timeline = replay.timeline
+    build_order = dict()
+    for player in replay.players:
+        build_order_data = list()
+
+        for state in timeline:
+            # the dict that contains all of the units, buildings, upgrades,
+            # at an instance of time
+            current_time_status = dict()
+
+            # units
+            units = state[player]['unit']
+            unitnames = units.keys()
+
+            # buildings
+            buildings = state[player]['building']
+            buildingnames = buildings.keys()
+
+            # upgrades
+            upgrades = state[player]['upgrade']
+
+            for name in unitnames:
+                unitdata = units[name]
+                unitcount = unitdata['live'] + unitdata['died']
+                if unitcount != 0:
+                    utils.add_if_key_exists(
+                        current_time_status,
+                        ALIASES[name] if name in ALIASES else name,
+                        unitcount)
+
+            for name in buildingnames:
+                buildingdata = buildings[name]
+                buildingcount = buildingdata['live'] + buildingdata['died']
+                if buildingcount != 0:
+                    utils.add_if_key_exists(
+                        current_time_status,
+                        ALIASES[name] if name in ALIASES else name,
+                        buildingcount)
+
+            for upgrade in upgrades:
+                current_time_status[upgrade] = 1
+
+            build_order_data.append(current_time_status)
+
+        build_order[player] = build_order_data
+    return build_order
+
+
 def get_player_names(replay):
-    """ Returns a dictionary of names with corresponding index (1 or 2) """
+    """ Returns a dictionary of names with corresponding index (1 or 2)
+    e.g.
+    {
+        1: "MetriC",
+        2: "JohnDoe"
+    }
+    """
     players = replay.players
     return dict([(key, players[key].name) for key in players])
 

@@ -60,6 +60,9 @@
             <div class="graphContainer fullblock supply" id="supplyChartContainer">
                 <canvas id="supplyChart"></canvas>
             </div>
+
+            <div class="build" id="benchmarkBuild"></div>
+            <div class="build" id="ownBuild"></div>
         </div>
 
         <script type="text/javascript">
@@ -73,7 +76,7 @@
                 // both values must be selected
                 if (benchPlayerValue != "" && ownPlayerValue != "") {
                     var timestamps = {{ bench_timestamps|tojson }}[benchPlayerValue];
-                    
+
                     // minerals
                     var benchMinerals = {{ bench_minerals|tojson }}[benchPlayerValue];
                     ownMinerals = {{ own_minerals|tojson }}[ownPlayerValue];
@@ -89,12 +92,18 @@
                     // supply
                     var benchSupply = {{ bench_supply|tojson }}[benchPlayerValue];
                     var ownSupply = {{ own_supply|tojson }}[ownPlayerValue];
-                    
+
+                    // build
+                    var benchBuild = {{ bench_build|tojson }}[benchPlayerValue];
+                    var ownBuild = {{ own_build|tojson }}[ownPlayerValue];
+
                     // these show functions are all contained in static/graphing.js
                     showMineralGraph(timestamps, benchMinerals, ownMinerals);
                     showGasGraph(timestamps, benchGas, ownGas);
                     showWorkersGraph(timestamps, benchWorkers, ownWorkers);
                     showSupplyGraph(timestamps, benchSupply, ownSupply);
+
+                    showBuild(timestamps, benchBuild, ownBuild);
                 }
             }
         </script>

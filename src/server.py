@@ -185,6 +185,10 @@ def analyze(hash: str):
         replayparser.get_total_supply,
         bench_replay, own_replay
     )
+    bench_build, own_build = replayparser.dual_data(
+        replayparser.get_build_order,
+        bench_replay, own_replay
+    )
 
     return render_template(
         ANALYZE_HTML,
@@ -193,7 +197,8 @@ def analyze(hash: str):
         bench_minerals=bench_minerals, own_minerals=own_minerals,
         bench_gas=bench_gas, own_gas=own_gas,
         bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce,
-        bench_supply=bench_supply, own_supply=own_supply)
+        bench_supply=bench_supply, own_supply=own_supply,
+        bench_build=bench_build, own_build=own_build)
 
 
 def run_server():
