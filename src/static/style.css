@@ -47,6 +47,25 @@ h1 {
     column-gap: 1em;
 }
 
+.timestamp {
+    border-bottom: 1px lightgray solid;
+}
+
+.buildBlock {
+    border-bottom: 1px lightgray solid;
+    display: flex;
+    flex-direction: row;
+}
+
+.buildBlock > * {
+    margin-right: 1em;
+}
+
+.buildTitle {
+    font-size: 2em;
+    padding-bottom: 1em;
+}
+
 #benchupload {
     grid-column: 1;
     grid-row: 1;

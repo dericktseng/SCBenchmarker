@@ -1,5 +1,5 @@
 from zephyrus_sc2_parser import parse_replay
-from .constants import TICKS_PER_SECOND, ALIASES
+from .constants import TICKS_PER_SECOND, ALIASES, BLACKLIST
 from .config import DELTA_SECOND
 from . import utils
 
@@ -136,7 +136,7 @@ def get_build_order(replay):
             for name in unitnames:
                 unitdata = units[name]
                 unitcount = unitdata['live'] + unitdata['died']
-                if unitcount != 0:
+                if unitcount != 0 and name not in BLACKLIST:
                     utils.add_if_key_exists(
                         current_time_status,
                         ALIASES[name] if name in ALIASES else name,
@@ -145,7 +145,7 @@ def get_build_order(replay):
             for name in buildingnames:
                 buildingdata = buildings[name]
                 buildingcount = buildingdata['live'] + buildingdata['died']
-                if buildingcount != 0:
+                if buildingcount != 0 and name not in BLACKLIST:
                     utils.add_if_key_exists(
                         current_time_status,
                         ALIASES[name] if name in ALIASES else name,

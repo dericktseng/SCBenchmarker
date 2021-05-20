@@ -20,5 +20,29 @@ ALIASES = {
     'SupplyDepotLowered': 'SupplyDepot',
     'LiberatorAG': 'Liberator',
     'WidowMineBurrowed': 'WidowMine',
-    'ObserverSiegeMode': 'Observer'
+    'ObserverSiegeMode': 'Observer',
+    'OverlordTransport': 'DropperLord',
+    'LurkerDenMP': 'LurkerDen',
+    'LurkerMP': 'Lurker',
+    'SwarmHostMP': 'SwarmHost'
 }
+
+# blacklist specific entries from showing up.
+BLACKLIST = [
+    'Egg',
+    'Larva',
+    'CreepTumorBurrowed',
+    'RavagerCocoon',
+    'CreepTumor',
+    'LurkerMPEgg',
+    'LocustMP',
+    'LocustMPFlying',
+    'LocustMPPrecursor',
+    'BroodLordCocoon',
+    'BroodlingEscort',
+    'Broodling',
+    'BanelingCocoon',
+    'OverlordCocoon',
+    'TransportOverlordCocoon',
+    'CreepTumorQueen'
+]

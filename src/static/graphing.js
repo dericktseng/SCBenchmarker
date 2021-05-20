@@ -155,6 +155,7 @@ function displayBuild(target, timestamps, buildList) {
 
         if (validTime) {
             var timestampElement = document.createElement("div");
+            timestampElement.className += 'timestamp'
             timestampElement.innerText = timestamps[i];
             target.appendChild(timestampElement);
             target.appendChild(buildBlock);

@@ -6,7 +6,7 @@ import os
 TODO - allow absolute paths as well"""
 
 """The folder that stores the professional benchmarks."""
-SAVED_REPLAY_FOLDER = '../test-replays'
+SAVED_REPLAY_FOLDER = '../saved-replays'
 
 """The folder that stores the user replays."""
 USER_UPLOAD_FOLDER = '../user-replays'
