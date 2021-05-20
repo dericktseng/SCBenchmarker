@@ -179,24 +179,19 @@ def dual_data(func, replay1, replay2):
          func(replay2) = {1: [1,2,3,4], 2: [1,2,3,4]}
          returns {1: [a,b,c,d], 2: [a,b,c,d]}, {1: [1,2,3,4], 2: [1,2,3,4]}
     """
-    shortData = func(replay1)
-    longData = func(replay2)
-    swapped = False
+    data1 = func(replay1)
+    data2 = func(replay2)
 
-    if type(shortData[1]) is not type(longData[1]):
+    if type(data1[1]) is not type(data2[1]):
         raise TypeError('Type Mismatch between data in replays')
-    elif type(shortData[1]) is not list:
-        return shortData, longData
+    elif type(data1[1]) is not list:
+        return data1, data2
     else:
         # trims the long data to match length of short data
-        if len(shortData[1]) > len(longData[1]):
-            shortData, longData = longData, shortData
-            swapped = True
+        trimmed_length = min(len(data1[1]), len(data2[1]))
 
-        for player in longData:
-            longData[player] = longData[player][:len(shortData[1])]
-
-        if swapped:
-            return longData, shortData
-        else:
-            return shortData, longData
+        # data1 and data2 should both have the same players (1 and 2)
+        for player in data1:
+            data1[player] = data1[player][:trimmed_length]
+            data2[player] = data2[player][:trimmed_length]
+        return data1, data2
