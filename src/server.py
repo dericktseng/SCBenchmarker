@@ -4,7 +4,6 @@ from flask import \
     request, \
     redirect, \
     url_for, \
-    session, \
     flash
 from .config import \
     SAVED_REPLAY_FOLDER, \
@@ -16,8 +15,7 @@ from .constants import \
     SAVED_REPLAYS_TAG, \
     INDEX_HTML, \
     ANALYZE_HTML, \
-    FLASK_CONFIG, \
-    SESSION_FILENAME_DATA
+    FLASK_CONFIG
 
 from .utils import valid_names, get_file_hash
 from . import replayparser
@@ -63,7 +61,8 @@ def upload_replays():
         flash("Error in request name variables")
         return redirect(request.url)
 
-    # type werkzeug.FileStorage
+    # type werkzeug.FileStorage, this is the files and names
+    # that the user uploads, not the hashed versions.
     own_replay_file = request.files[OWN_REPLAY_TAG]
     bench_replay_file = request.files[BENCH_REPLAY_TAG]
     own_replay_filename = own_replay_file.filename
@@ -91,8 +90,13 @@ def upload_replays():
     with open(own_replay_filename, 'wb') as f:
         f.write(own_replay)
 
+    # name of benchmark replay filename (to pass to analyze)
+    bench_replay_filename = ''
+
     # if request.form uses SAVED_REPLAYS_TAG, we use saved replays
+    use_saved_replay = False
     if request.form:
+        use_saved_replay = True
         savedfileName = request.form.get(SAVED_REPLAYS_TAG) \
             + "." \
             + SC2REPLAY
@@ -114,36 +118,36 @@ def upload_replays():
 
     analyze_url = url_for(
         'analyze',
-        hash=own_replay_hash)
-
-    session[SESSION_FILENAME_DATA] = {
-        'filename_own': own_replay_filename,
-        'filename_bench': bench_replay_filename
-    }
+        basename_bench=os.path.basename(bench_replay_filename),
+        basename_own=os.path.basename(own_replay_filename),
+        use_saved_replay=use_saved_replay)
 
     return redirect(analyze_url)
 
 
-@app.route('/<hash>', methods=['GET'])
-def analyze(hash: str):
+@app.route('/analyze', methods=['GET'])
+def analyze():
     """analyzes the replay with the given filehash.
     And returns the html page that displays the graphs.
 
     Parameters:
-    - hash: the hash of user-uploaded file
-        (uploaded file should have been renamed to its hash)
+    - basename_bench - basename of the benchmark replay
+    - basename_own - basename of user-uploaded own replay
+    - use_saved_replay - whether the benchmark is a saved replay
     """
-    # TODO
-    filenames = session.get(SESSION_FILENAME_DATA, None)
-    filename_bench = None
-    filename_own = None
+    filename_bench = request.args.get('basename_bench', default=None)
+    filename_own = request.args.get('basename_own', default=None)
 
-    if filenames is not None:
-        filename_bench = filenames['filename_bench']
-        filename_own = filenames['filename_own']
-    else:
-        flash("Session Expired")
+    # although this is passed in as a boolean, it gets converted to a string.
+    use_saved_replay = request.args.get('use_saved_replay', default=None)
+
+    if filename_bench is None or filename_own is None or use_saved_replay is None:
+        flash("Replay files cannot be found (Did you upload a replay?)")
         return redirect(url_for('index'))
+    else:
+        bench_folder = saved_replay_folder_path if use_saved_replay == "True" else user_upload_folder_path
+        filename_bench = os.path.join(bench_folder, filename_bench)
+        filename_own = os.path.join(user_upload_folder_path, filename_own)
 
     # validates the replay files as an actual replay that can be parsed.
     bench_replay = None

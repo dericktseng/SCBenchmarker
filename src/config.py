@@ -2,8 +2,8 @@ import os
 
 """=== Program configurations ==="""
 
-"""All Folder paths are relative to THIS FILE (config.py)
-Either relative or absolute paths are accepted."""
+"""All Folder paths are relative to THIS FILE (config.py).
+TODO - allow absolute paths as well"""
 
 """The folder that stores the professional benchmarks."""
 SAVED_REPLAY_FOLDER = '../test-replays'
