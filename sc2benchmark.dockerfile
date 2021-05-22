@@ -1,5 +1,4 @@
 FROM python:3.8.5
-RUN apt-get update
 RUN git clone https://github.com/MetriC-DT/SCBenchmarker.git
 WORKDIR SCBenchmarker
 RUN pip install -r requirements.txt
