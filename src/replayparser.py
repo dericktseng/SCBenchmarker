@@ -162,11 +162,7 @@ def get_build_order(replay):
 
 def get_player_names(replay):
     """ Returns a dictionary of names with corresponding index (1 or 2)
-    e.g.
-    {
-        1: "MetriC",
-        2: "JohnDoe"
-    }
+    e.g. {1: "MetriC", 2: "JohnDoe"}
     """
     players = replay.players
     return dict([(key, players[key].name) for key in players])
@@ -182,7 +178,16 @@ def dual_data(func, replay1, replay2):
     data1 = func(replay1)
     data2 = func(replay2)
 
-    if type(data1[1]) is not type(data2[1]):
+    """ validates data returned
+    1 & 2 of func(replay1) are same types
+    1 & 2 of func(replay2) are same types
+    types of func(replay1)[1] and func(replay2)[1] are same
+    """
+    if type(data1[1]) is not type(data1[2]):
+        raise TypeError('Type Mismatch between data in replay1')
+    elif type(data2[1]) is not type(data2[2]):
+        raise TypeError('Type Mismatch between data in replay2')
+    elif type(data1[1]) is not type(data2[1]):
         raise TypeError('Type Mismatch between data in replays')
     elif type(data1[1]) is not list:
         return data1, data2
