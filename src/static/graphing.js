@@ -147,6 +147,8 @@ function displayBuild(target, timestamps, buildList) {
         buildBlock.classList.add('buildBlock');
         buildBlock.classList.add(time);
 
+        var buildEntryCount = 0;
+
         for(buildEntry in currBuildListItem) {
             if (buildEntry in prevBuildListItem) {
                 var diff = currBuildListItem[buildEntry] - prevBuildListItem[buildEntry];
@@ -156,6 +158,7 @@ function displayBuild(target, timestamps, buildList) {
                     validTime = true;
                     addTagIfWorker(buildElement, buildEntry);
                     buildBlock.appendChild(buildElement);
+                    buildEntryCount += 1;
                 }
             } else {
                 var buildElement = document.createElement("div");
@@ -163,17 +166,22 @@ function displayBuild(target, timestamps, buildList) {
                 validTime = true;
                 addTagIfWorker(buildElement, buildEntry);
                 buildBlock.appendChild(buildElement);
+                buildEntryCount += 1;
             }
         }
 
         if (validTime) {
             var timestampElement = document.createElement("div");
             timestampElement.classList.add('timestamp');
-            timestampElement.classList.add(time);
             timestampElement.innerText = timestamps[i];
             target.appendChild(timestampElement);
             target.appendChild(buildBlock);
             validTime = false;
+
+            if (buildEntryCount == 1 && buildBlock.children[0].className == workerClass) {
+                buildBlock.classList.add(workerClass);
+                timestampElement.classList.add(workerClass);
+            }
         }
 
         prevBuildListItem = currBuildListItem;
@@ -189,29 +197,15 @@ function showBuild(timestamps, bench, own) {
     displayBuild(ownElement, timestamps, own);
 }
 
-function toggleClass(listFromClass, displayStyle) {
-    for (elem of listFromClass) {
-        elem.style.display = displayStyle;
-
-        // if worker is the only one, hide entire build block and corresponding timestamp:
-        if (elem.parentNode.childElementCount == 1) {
-            var timestamp = elem.parentNode.classList[1];
-            var correspondingElements = document.getElementsByClassName(timestamp);
-
-            for (element of correspondingElements) {
-                element.style.display = displayStyle;
-            }
-        }
-    }
-}
-
 function toggleWorkers(checkboxElement) {
     var workerElements = document.getElementsByClassName(workerClass);
 
     // show workers if checked, else hide them. Hidden by default
-    if (checkboxElement.checked) {
-        toggleClass(workerElements, "none");
-    } else {
-        toggleClass(workerElements, "block")
+    for (workerElement of workerElements) {
+        if (checkboxElement.checked) {
+            workerElement.style.display = "flex";
+        } else {
+            workerElement.style.display = "none";
+        }
     }
 }
