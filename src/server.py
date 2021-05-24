@@ -58,7 +58,7 @@ def upload_replays():
     """Reads the replays to be analyzed."""
 
     if not valid_names(request):
-        flash("Error in request name variables")
+        flash('Error in request name variables')
         return redirect(request.url)
 
     # type werkzeug.FileStorage, this is the files and names
@@ -153,14 +153,13 @@ def analyze():
     bench_replay = None
     own_replay = None
     try:
-        bench_replay = replayparser.load_replay_file(
-            filename_bench)
-        own_replay = replayparser.load_replay_file(
-            filename_own)
+        bench_replay, own_replay = replayparser.load_replays_as_sc2replay(
+            [filename_bench, filename_own])
     except PlayerCountError:
         flash("Only two player replays are supported!")
         return redirect(url_for('index'))
-    except Exception:
+    except Exception as e:
+        print(str(e))
         flash("Unable to read replay")
         return redirect(url_for('index'))
 

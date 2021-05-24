@@ -1,7 +1,8 @@
 from zephyrus_sc2_parser import parse_replay
 from .constants import TICKS_PER_SECOND, ALIASES, BLACKLIST
-from .config import DELTA_SECOND
+from .config import DELTA_SECOND, MULTIPROCESS, MAX_WORKERS
 from . import utils
+import concurrent.futures
 
 
 def load_replay_file(path_to_replay: str):
@@ -11,6 +12,22 @@ def load_replay_file(path_to_replay: str):
         path_to_replay,
         local=True,
         tick=deltatick)
+
+
+def load_replays_as_sc2replay(lst: list):
+    """ loads in a list of paths to sc2replays, and uses
+    the zephyrus_sc2_parser on all of them to return the replay object.
+
+    parameters:
+        lst - list of replay paths
+    """
+    # uses multiprocess to load in parallel.
+    if MULTIPROCESS:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(load_replay_file, path) for path in lst]
+        return [f.result() for f in futures]
+    else:
+        return [load_replay_file(path) for path in lst]
 
 
 def to_MM_SS(time_in_seconds):

@@ -12,7 +12,14 @@ SAVED_REPLAY_FOLDER = '../saved-replays'
 USER_UPLOAD_FOLDER = '../user-replays'
 
 """time between measuring a data point"""
-DELTA_SECOND = 3
+DELTA_SECOND = 2
+
+""" Allows multiprocess loading of replays. """
+MULTIPROCESS = True
+
+""" Number of workers for multiprocessing. None defaults to 61.
+Documentation here: https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor"""
+MAX_WORKERS = 2
 
 
 """=== Flask configuration ==="""
