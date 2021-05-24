@@ -7,7 +7,10 @@ from flask import \
     flash
 from .config import \
     SAVED_REPLAY_FOLDER, \
-    USER_UPLOAD_FOLDER
+    USER_UPLOAD_FOLDER, \
+    DELTA_SECOND, \
+    MULTIPROCESS, \
+    MAX_WORKERS
 from .constants import \
     SC2REPLAY, \
     OWN_REPLAY_TAG, \
@@ -154,7 +157,10 @@ def analyze():
     own_replay = None
     try:
         bench_replay, own_replay = replayparser.load_replays_as_sc2replay(
-            [filename_bench, filename_own])
+            [filename_bench, filename_own],
+            MULTIPROCESS,
+            MAX_WORKERS,
+            DELTA_SECOND)
     except PlayerCountError:
         flash("Only two player replays are supported!")
         return redirect(url_for('index'))
