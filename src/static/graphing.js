@@ -1,5 +1,7 @@
 var benchmark_color = "#2abfa4";
 var own_color = "#b12abf";
+var workerUnits = ['Probe', 'SCV', 'Drone'];
+var workerClass = 'worker'
 
 /**
  * clears the graph on the canvas
@@ -114,6 +116,13 @@ function showSupplyGraph(timestamps, bench, own) {
         canvas);
 }
 
+function addTagIfWorker(element, buildEntry) {
+    // tag classname as worker if worker unit. This is to hide if checkbox is ticked.
+    if (workerUnits.includes(buildEntry)) {
+        element.className += workerClass;
+    }
+}
+
 /**
  * 
  * @param {HTMLElement} target target to display on.
@@ -129,12 +138,14 @@ function displayBuild(target, timestamps, buildList) {
     for(i = 0; i < timestamps.length; i++) {
         // dictionary of units, buildings, upgrades, entries at a timestamp
         var currBuildListItem = buildList[i];
+        var time = timestamps[i];
         
         // whether timestamp has something changing in the build
         var validTime = false;
 
         var buildBlock = document.createElement("div");
-        buildBlock.className += 'buildBlock';
+        buildBlock.classList.add('buildBlock');
+        buildBlock.classList.add(time);
 
         for(buildEntry in currBuildListItem) {
             if (buildEntry in prevBuildListItem) {
@@ -142,27 +153,30 @@ function displayBuild(target, timestamps, buildList) {
                 if (diff > 0) {
                     var buildElement = document.createElement("div");
                     buildElement.innerText = buildEntry + ": " + diff;
-                    buildBlock.appendChild(buildElement);
                     validTime = true;
+                    addTagIfWorker(buildElement, buildEntry);
+                    buildBlock.appendChild(buildElement);
                 }
             } else {
                 var buildElement = document.createElement("div");
                 buildElement.innerText = buildEntry + ": " + currBuildListItem[buildEntry];
-                buildBlock.appendChild(buildElement);
                 validTime = true;
+                addTagIfWorker(buildElement, buildEntry);
+                buildBlock.appendChild(buildElement);
             }
         }
 
         if (validTime) {
             var timestampElement = document.createElement("div");
-            timestampElement.className += 'timestamp'
+            timestampElement.classList.add('timestamp');
+            timestampElement.classList.add(time);
             timestampElement.innerText = timestamps[i];
             target.appendChild(timestampElement);
             target.appendChild(buildBlock);
+            validTime = false;
         }
 
         prevBuildListItem = currBuildListItem;
-        validTime = false;
     }
 }
 
@@ -173,4 +187,31 @@ function showBuild(timestamps, bench, own) {
     // all of timestamp, bench, and own should have the same length:
     displayBuild(benchElement, timestamps, bench);
     displayBuild(ownElement, timestamps, own);
+}
+
+function toggleClass(listFromClass, displayStyle) {
+    for (elem of listFromClass) {
+        elem.style.display = displayStyle;
+
+        // if worker is the only one, hide entire build block and corresponding timestamp:
+        if (elem.parentNode.childElementCount == 1) {
+            var timestamp = elem.parentNode.classList[1];
+            var correspondingElements = document.getElementsByClassName(timestamp);
+
+            for (element of correspondingElements) {
+                element.style.display = displayStyle;
+            }
+        }
+    }
+}
+
+function toggleWorkers(checkboxElement) {
+    var workerElements = document.getElementsByClassName(workerClass);
+
+    // show workers if checked, else hide them. Hidden by default
+    if (checkboxElement.checked) {
+        toggleClass(workerElements, "none");
+    } else {
+        toggleClass(workerElements, "block")
+    }
 }
