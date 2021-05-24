@@ -18,9 +18,9 @@
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul class=flashes>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
+                    {% for message in messages %}
+                        <li>{{ message|e }}</li>
+                    {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
@@ -30,7 +30,7 @@
                 <p><select name="benchName" id="benchName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
                     {% for pid in bench_players %}
-                        <option value={{ pid }}>{{ bench_players[pid] }}</option>
+                        <option value={{ pid|e }}>{{ bench_players[pid]|e }}</option>
                     {% endfor %}
                 </select></p>
             </div>
@@ -40,7 +40,7 @@
                 <p><select name="ownName" id="ownName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
                     {% for pid in own_players %}
-                        <option value={{ pid }}>{{ own_players[pid] }}</option>
+                        <option value={{ pid|e }}>{{ own_players[pid]|e }}</option>
                     {% endfor %}
                 </select></p>
             </div>
