@@ -7,7 +7,7 @@ You know you suck. But you don't know *how* much you suck. Introducing SCBenchma
     * `FLASK_ENV="production"`
     * `DEBUG=False`
     * `TESTING=False`
-    * `SERVER_NAME="As you see fit"`
+    * `SERVER_NAME=` As you see fit
 * `python3 SCBenchmarker.py`
 
 ## Installation:

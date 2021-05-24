@@ -1,16 +1,39 @@
 from zephyrus_sc2_parser import parse_replay
 from .constants import TICKS_PER_SECOND, ALIASES, BLACKLIST
-from .config import DELTA_SECOND
 from . import utils
+import concurrent.futures
 
 
-def load_replay_file(path_to_replay: str):
+def load_replay_file(path_to_replay: str, delta_second: int):
     """ Loads the replay file defined by path_to_replay."""
-    deltatick = DELTA_SECOND * TICKS_PER_SECOND
+    deltatick = delta_second * TICKS_PER_SECOND
     return parse_replay(
         path_to_replay,
         local=True,
         tick=deltatick)
+
+
+def load_replays_as_sc2replay(
+        lst: list,
+        allow_multiprocess: bool,
+        max_workers: int,
+        delta_second: int):
+    """ loads in a list of paths to sc2replays, and uses
+    the zephyrus_sc2_parser on all of them to return the replay object.
+
+    parameters:
+        lst - list of replay paths
+        allow_multiprocess - whether to use multiprocessing or not
+        max_workers - max number of multiprocess workers
+        delta_second - time in seconds between polls of the replay
+    """
+    # uses multiprocess to load in parallel.
+    if allow_multiprocess:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(load_replay_file, path, delta_second) for path in lst]
+        return [f.result() for f in futures]
+    else:
+        return [load_replay_file(path) for path in lst]
 
 
 def to_MM_SS(time_in_seconds):
@@ -183,11 +206,11 @@ def dual_data(func, replay1, replay2):
     1 & 2 of func(replay2) are same types
     types of func(replay1)[1] and func(replay2)[1] are same
     """
-    if type(data1[1]) is not type(data1[2]):
+    if not isinstance(data1[1], type(data1[2])):
         raise TypeError('Type Mismatch between data in replay1')
-    elif type(data2[1]) is not type(data2[2]):
+    elif not isinstance(data2[1], type(data2[2])):
         raise TypeError('Type Mismatch between data in replay2')
-    elif type(data1[1]) is not type(data2[1]):
+    elif not isinstance(data1[1], type(data2[1])):
         raise TypeError('Type Mismatch between data in replays')
     elif type(data1[1]) is not list:
         return data1, data2
