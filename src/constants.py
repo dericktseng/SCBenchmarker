@@ -14,21 +14,42 @@ SAVED_REPLAYS_TAG = 'saved_replay'
 
 # aliases for units in different modes, set to the same unit
 ALIASES = {
+    # protoss aliases
     'WarpPrismPhasing': 'WarpPrism',
     'WarpGate': 'Gateway',
-    'SiegeTankSieged': 'SiegeTank',
-    'SupplyDepotLowered': 'SupplyDepot',
-    'LiberatorAG': 'Liberator',
-    'WidowMineBurrowed': 'WidowMine',
     'ObserverSiegeMode': 'Observer',
+
+    # zerg aliases
     'OverlordTransport': 'DropperLord',
     'LurkerDenMP': 'LurkerDen',
     'LurkerMP': 'Lurker',
-    'SwarmHostMP': 'SwarmHost'
+    'SwarmHostMP': 'SwarmHost',
+
+    # terran aliases
+    'SiegeTankSieged': 'SiegeTank',
+    'SupplyDepotLowered': 'SupplyDepot',
+    'LiberatorAG': 'Liberator',
+    'ThorAP': 'Thor',
+    'WidowMineBurrowed': 'WidowMine',
+    'BarracksReactor': 'Reactor',
+    'FactoryReactor': 'Reactor',
+    'StarportReactor': 'Reactor',
+    'FactoryTechLab': 'TechLab',
+    'StarportTechLab': 'TechLab',
+    'BarracksTechLab': 'TechLab',
+    'BarracksFlying': 'Barracks',
+    'FactoryFlying': 'Factory',
+    'StarportFlying': 'Starport',
+    'CommandCenterFlying': 'CommandCenter',
+    'OrbitalCommandFlying': 'OrbitalCommand',
+    'VikingFighter': 'Viking',
+    'VikingAssault': 'Viking',
+    'PunisherGrenades': 'ConcussiveShells'
 }
 
 # blacklist specific entries from showing up.
 BLACKLIST = [
+    # Zerg
     'Egg',
     'Larva',
     'CreepTumorBurrowed',
@@ -44,5 +65,11 @@ BLACKLIST = [
     'BanelingCocoon',
     'OverlordCocoon',
     'TransportOverlordCocoon',
-    'CreepTumorQueen'
+    'CreepTumorQueen',
+
+    # Terran
+    'MULE',
+
+    # Protoss
+    'Interceptor'
 ]
