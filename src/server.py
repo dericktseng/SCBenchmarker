@@ -1,3 +1,6 @@
+import os
+import sys
+from zephyrus_sc2_parser.exceptions import PlayerCountError
 from flask import \
     Flask, \
     render_template, \
@@ -5,13 +8,17 @@ from flask import \
     redirect, \
     url_for, \
     flash
-from .config import \
+
+# hack to enable importing from src (appends parent dir to PYTHONPATH)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.config import \
     SAVED_REPLAY_FOLDER, \
     USER_UPLOAD_FOLDER, \
     DELTA_SECOND, \
     MULTIPROCESS, \
     MAX_WORKERS
-from .constants import \
+from src.constants import \
     SC2REPLAY, \
     OWN_REPLAY_TAG, \
     BENCH_REPLAY_TAG, \
@@ -20,10 +27,8 @@ from .constants import \
     ANALYZE_HTML, \
     FLASK_CONFIG
 
-from .utils import valid_names, get_file_hash
-from . import replayparser
-from zephyrus_sc2_parser.exceptions import PlayerCountError
-import os
+from src.utils import valid_names, get_file_hash
+from src import replayparser
 
 app = Flask(__name__)
 
@@ -222,3 +227,8 @@ def run_server():
 
     # starts the server
     app.run()
+
+
+# alternate (and preferred) entry point of the application
+if __name__ == '__main__':
+    run_server()
