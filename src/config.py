@@ -1,15 +1,15 @@
 import os
 
-"""=== Program configurations ==="""
+"""=== Program configurations === """
 
-"""All Folder paths are relative to THIS FILE (config.py).
-TODO - allow absolute paths as well"""
+""" directory of the root of the project """
+PROJ_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
-"""The folder that stores the professional benchmarks."""
-SAVED_REPLAY_FOLDER = '../saved-replays'
+""" path to the folder containing saved benchmark replays """
+SAVED_REPLAY_FOLDER_PATH = os.path.join(PROJ_DIR, 'saved-replays')
 
-"""The folder that stores the user replays."""
-USER_UPLOAD_FOLDER = '../user-replays'
+""" path to the folder containing replays the user uploads """
+USER_UPLOAD_FOLDER_PATH = os.path.join(PROJ_DIR, 'user-replays')
 
 """time between measuring a data point"""
 DELTA_SECOND = 2
@@ -28,5 +28,6 @@ SECRET_KEY = os.urandom(24)
 FLASK_ENV = 'development'  # development or production
 DEBUG = True
 TESTING = True
-UPLOAD_FOLDER = USER_UPLOAD_FOLDER
+UPLOAD_FOLDER = USER_UPLOAD_FOLDER_PATH
 SERVER_NAME = '127.0.0.1:9999'
+

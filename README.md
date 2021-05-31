@@ -8,8 +8,7 @@ You know you suck. But you don't know *how* much you suck. Introducing SCBenchma
     * `DEBUG=False`
     * `TESTING=False`
     * `SERVER_NAME=` As you see fit
-* `python3 SCBenchmarker.py` OR `python3 src/server.py`
-    * Alternate entry point in `src/server.py` is preferred as a convenience for uwsgi server setup.
+* `python3 SCBenchmarker.py`
 
 ## Installation:
 `pip install -r requirements.txt`
