@@ -33,7 +33,7 @@ def load_replays_as_sc2replay(
             futures = [executor.submit(load_replay_file, path, delta_second) for path in lst]
         return [f.result() for f in futures]
     else:
-        return [load_replay_file(path) for path in lst]
+        return [load_replay_file(path, delta_second) for path in lst]
 
 
 def to_MM_SS(time_in_seconds):
