@@ -1,5 +1,4 @@
 import os
-import sys
 from zephyrus_sc2_parser.exceptions import PlayerCountError
 from flask import \
     Flask, \
@@ -9,45 +8,32 @@ from flask import \
     url_for, \
     flash
 
-# hack to enable importing from src (appends parent dir to PYTHONPATH)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.config import \
-    SAVED_REPLAY_FOLDER, \
-    USER_UPLOAD_FOLDER, \
+from .config import \
     DELTA_SECOND, \
     MULTIPROCESS, \
-    MAX_WORKERS
-from src.constants import \
+    MAX_WORKERS, \
+    SAVED_REPLAY_FOLDER_PATH, \
+    USER_UPLOAD_FOLDER_PATH
+
+from .constants import \
     SC2REPLAY, \
     OWN_REPLAY_TAG, \
     BENCH_REPLAY_TAG, \
     SAVED_REPLAYS_TAG, \
     INDEX_HTML, \
-    ANALYZE_HTML, \
-    FLASK_CONFIG
+    ANALYZE_HTML
 
-from src.utils import valid_names, get_file_hash
-from src import replayparser
+from .utils import valid_names, get_file_hash
+from . import replayparser
 
 app = Flask(__name__)
-
-FILE_DIR = os.path.dirname(__file__)
-
-saved_replay_folder_path = os.path.join(
-    FILE_DIR,
-    SAVED_REPLAY_FOLDER)
-
-user_upload_folder_path = os.path.join(
-    FILE_DIR,
-    USER_UPLOAD_FOLDER)
 
 
 @app.route('/', methods=['GET'])
 def index():
     """Renders the index file to be served at root."""
 
-    replays = os.listdir(saved_replay_folder_path)
+    replays = os.listdir(SAVED_REPLAY_FOLDER_PATH)
 
     # strips .SC2Replay extension from replay name
     extlength = len('.{}'.format(SC2REPLAY))
@@ -92,7 +78,7 @@ def upload_replays():
     own_replay = own_replay_file.read()
     own_replay_hash = get_file_hash(own_replay)
     own_replay_filename = os.path.join(
-        user_upload_folder_path,
+        USER_UPLOAD_FOLDER_PATH,
         own_replay_hash + '.' + SC2REPLAY)
     own_replay_file.close()
     with open(own_replay_filename, 'wb') as f:
@@ -110,7 +96,7 @@ def upload_replays():
             + SC2REPLAY
 
         bench_replay_filename = os.path.join(
-            saved_replay_folder_path,
+            SAVED_REPLAY_FOLDER_PATH,
             savedfileName)
     # otherwise, use uploaded benchmark replay
     else:
@@ -118,7 +104,7 @@ def upload_replays():
         bench_replay = bench_replay_file.read()
         bench_replay_hash = get_file_hash(bench_replay)
         bench_replay_filename = os.path.join(
-            user_upload_folder_path,
+            USER_UPLOAD_FOLDER_PATH,
             bench_replay_hash + '.' + SC2REPLAY)
         bench_replay_file.close()
         with open(bench_replay_filename, 'wb') as f:
@@ -153,9 +139,9 @@ def analyze():
         flash("Replay files cannot be found (Did you upload a replay?)")
         return redirect(url_for('index'))
     else:
-        bench_folder = saved_replay_folder_path if use_saved_replay == "True" else user_upload_folder_path
+        bench_folder = SAVED_REPLAY_FOLDER_PATH if use_saved_replay == "True" else USER_UPLOAD_FOLDER_PATH
         filename_bench = os.path.join(bench_folder, filename_bench)
-        filename_own = os.path.join(user_upload_folder_path, filename_own)
+        filename_own = os.path.join(USER_UPLOAD_FOLDER_PATH, filename_own)
 
     # validates the replay files as an actual replay that can be parsed.
     bench_replay = None
@@ -213,22 +199,3 @@ def analyze():
         bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce,
         bench_supply=bench_supply, own_supply=own_supply,
         bench_build=bench_build, own_build=own_build)
-
-
-def run_server():
-    """Configures, then runs the Flask server."""
-    app.config.from_pyfile(FLASK_CONFIG)
-
-    # creates the user upload and saved replays folders
-    if not os.path.isdir(user_upload_folder_path):
-        os.mkdir(user_upload_folder_path)
-    if not os.path.isdir(saved_replay_folder_path):
-        os.mkdir(saved_replay_folder_path)
-
-    # starts the server
-    app.run()
-
-
-# alternate (and preferred) entry point of the application
-if __name__ == '__main__':
-    run_server()
