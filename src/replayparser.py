@@ -158,7 +158,7 @@ def get_build_order(replay):
 
             for name in unitnames:
                 unitdata = units[name]
-                unitcount = unitdata['live'] + unitdata['died']
+                unitcount = unitdata['live'] + unitdata['died'] + unitdata['in_progress']
                 if unitcount != 0 and name not in BLACKLIST:
                     utils.add_if_key_exists(
                         current_time_status,
@@ -167,7 +167,7 @@ def get_build_order(replay):
 
             for name in buildingnames:
                 buildingdata = buildings[name]
-                buildingcount = buildingdata['live'] + buildingdata['died']
+                buildingcount = buildingdata['live'] + buildingdata['died'] + buildingdata['in_progress']
                 if buildingcount != 0 and name not in BLACKLIST:
                     utils.add_if_key_exists(
                         current_time_status,

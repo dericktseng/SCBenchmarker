@@ -75,7 +75,7 @@ def upload_replays():
 
     # All cases below should be allowed
     # saves own_replay temp copy
-    own_replay = own_replay_file.read()
+    own_replay = own_replay_file.stream.read()
     own_replay_hash = get_file_hash(own_replay)
     own_replay_filename = os.path.join(
         USER_UPLOAD_FOLDER_PATH,
@@ -101,7 +101,7 @@ def upload_replays():
     # otherwise, use uploaded benchmark replay
     else:
         # saves temp copy of benchmark replay
-        bench_replay = bench_replay_file.read()
+        bench_replay = bench_replay_file.stream.read()
         bench_replay_hash = get_file_hash(bench_replay)
         bench_replay_filename = os.path.join(
             USER_UPLOAD_FOLDER_PATH,

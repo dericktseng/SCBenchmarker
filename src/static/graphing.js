@@ -134,8 +134,15 @@ function displayBuild(target, timestamps, buildList) {
     target.innerText = '';
 
     // dictionary of units, buildings, upgrades, entries at a timestamp
+    // initialized to first non-empty time disallow showing of the initial townhall and workers.
     var prevBuildListItem = {};
-    for(i = 0; i < timestamps.length; i++) {
+    var firstDisplayTime = 0;
+    while (Object.keys(prevBuildListItem).length == 0) {
+        prevBuildListItem = buildList[firstDisplayTime]
+        firstDisplayTime += 1
+    }
+    
+    for(let i = firstDisplayTime; i < timestamps.length; i++) {
         // dictionary of units, buildings, upgrades, entries at a timestamp
         var currBuildListItem = buildList[i];
         var time = timestamps[i];
@@ -151,6 +158,7 @@ function displayBuild(target, timestamps, buildList) {
 
         for(buildEntry in currBuildListItem) {
             if (buildEntry in prevBuildListItem) {
+                // difference between number of buildings/units current compared to previous
                 var diff = currBuildListItem[buildEntry] - prevBuildListItem[buildEntry];
                 if (diff > 0) {
                     var buildElement = document.createElement("div");
@@ -195,6 +203,8 @@ function showBuild(timestamps, bench, own) {
     // all of timestamp, bench, and own should have the same length:
     displayBuild(benchElement, timestamps, bench);
     displayBuild(ownElement, timestamps, own);
+
+    console.log(bench);
 }
 
 function toggleWorkers(checkboxElement) {
