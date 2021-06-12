@@ -203,8 +203,6 @@ function showBuild(timestamps, bench, own) {
     // all of timestamp, bench, and own should have the same length:
     displayBuild(benchElement, timestamps, bench);
     displayBuild(ownElement, timestamps, own);
-
-    console.log(bench);
 }
 
 function toggleWorkers(checkboxElement) {
