@@ -158,7 +158,7 @@ def analyze():
         return redirect(url_for('index', error=errormsg))
     except Exception as e:
         print(str(e))
-        errormsg = "Unable to read replay " + str(e)
+        errormsg = "Unable to read replay file. (Are you sure this is a replay?)"
         return redirect(url_for('index', error=errormsg))
 
     # data for graphing (JSON format)
