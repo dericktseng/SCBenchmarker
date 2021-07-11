@@ -24,7 +24,6 @@ MAX_WORKERS = 2
 
 """=== Flask configuration ==="""
 
-SECRET_KEY = os.urandom(24)
 FLASK_ENV = 'development'  # development or production
 DEBUG = True
 TESTING = True
