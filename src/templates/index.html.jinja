@@ -9,15 +9,9 @@
     </head>
     <body>
         <h1>SC2 Benchmarker</h1>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class=flashes>
-                {% for message in messages %}
-                    <li>{{ message|e }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+		{% if errors %}
+			<div class="flashes">{{ errors|e }}</div>
+		{% endif %}
         <form class="gridContainer" method="POST" action="" enctype="multipart/form-data">
             <div class="upload" id="benchupload">
                 <label for="{{ bench_replay_tag|e }}">Upload benchmark replay:</label>

@@ -5,8 +5,7 @@ from flask import \
     render_template, \
     request, \
     redirect, \
-    url_for, \
-    flash
+    url_for
 
 from .config import \
     DELTA_SECOND, \
@@ -34,6 +33,7 @@ def index():
     """Renders the index file to be served at root."""
 
     replays = os.listdir(SAVED_REPLAY_FOLDER_PATH)
+    errors = request.args.get('error', default=None, type=str)
 
     # strips .SC2Replay extension from replay name
     extlength = len('.{}'.format(SC2REPLAY))
@@ -41,6 +41,7 @@ def index():
 
     return render_template(
         INDEX_HTML,
+        errors=errors,
         saved_replays=replays,
         saved_replay_tag=SAVED_REPLAYS_TAG,
         own_replay_tag=OWN_REPLAY_TAG,
@@ -52,8 +53,8 @@ def upload_replays():
     """Reads the replays to be analyzed."""
 
     if not valid_names(request):
-        flash('Error in request name variables')
-        return redirect(request.url)
+        errormsg = 'Error in request name variables'
+        return redirect(url_for('index', error=errormsg))
 
     # type werkzeug.FileStorage, this is the files and names
     # that the user uploads, not the hashed versions.
@@ -64,18 +65,18 @@ def upload_replays():
 
     # checks whether a file was uploaded
     if own_replay_filename == '':
-        flash("You must supply your own replay!")
-        return redirect(request.url)
+        errormsg = 'You must supply your own replay!'
+        return redirect(url_for('index', error=errormsg))
     elif bench_replay_filename == '' and not request.form:
-        flash("You must have a benchmark replay!")
-        return redirect(request.url)
+        errormsg = 'You must have a benchmark replay!'
+        return redirect(url_for('index', error=errormsg))
     elif bench_replay_filename != '' and request.form:
-        flash("You cannot have two benchmarks selected!")
-        return redirect(request.url)
+        errormsg = 'You cannot have two benchmarks selected!'
+        return redirect(url_for('index', error=errormsg))
 
     # All cases below should be allowed
     # saves own_replay temp copy
-    own_replay = own_replay_file.read()
+    own_replay = own_replay_file.stream.read()
     own_replay_hash = get_file_hash(own_replay)
     own_replay_filename = os.path.join(
         USER_UPLOAD_FOLDER_PATH,
@@ -101,7 +102,7 @@ def upload_replays():
     # otherwise, use uploaded benchmark replay
     else:
         # saves temp copy of benchmark replay
-        bench_replay = bench_replay_file.read()
+        bench_replay = bench_replay_file.stream.read()
         bench_replay_hash = get_file_hash(bench_replay)
         bench_replay_filename = os.path.join(
             USER_UPLOAD_FOLDER_PATH,
@@ -129,17 +130,17 @@ def analyze():
     - basename_own - basename of user-uploaded own replay
     - use_saved_replay - whether the benchmark is a saved replay
     """
-    filename_bench = request.args.get('basename_bench', default=None)
-    filename_own = request.args.get('basename_own', default=None)
+    filename_bench = request.args.get('basename_bench', default=None, type=str)
+    filename_own = request.args.get('basename_own', default=None, type=str)
 
     # although this is passed in as a boolean, it gets converted to a string.
     use_saved_replay = request.args.get('use_saved_replay', default=None)
 
     if filename_bench is None or filename_own is None or use_saved_replay is None:
-        flash("Replay files cannot be found (Did you upload a replay?)")
-        return redirect(url_for('index'))
+        errormsg = 'Replay files cannot be found (Did you upload a replay?)'
+        return redirect(url_for('index', error=errormsg))
     else:
-        bench_folder = SAVED_REPLAY_FOLDER_PATH if use_saved_replay == "True" else USER_UPLOAD_FOLDER_PATH
+        bench_folder = SAVED_REPLAY_FOLDER_PATH if use_saved_replay == 'True' else USER_UPLOAD_FOLDER_PATH
         filename_bench = os.path.join(bench_folder, filename_bench)
         filename_own = os.path.join(USER_UPLOAD_FOLDER_PATH, filename_own)
 
@@ -153,12 +154,12 @@ def analyze():
             MAX_WORKERS,
             DELTA_SECOND)
     except PlayerCountError:
-        flash("Only two player replays are supported!")
-        return redirect(url_for('index'))
+        errormsg = 'Only two player replays are supported!'
+        return redirect(url_for('index', error=errormsg))
     except Exception as e:
         print(str(e))
-        flash("Unable to read replay.", str(e))
-        return redirect(url_for('index'))
+        errormsg = "Unable to read replay " + str(e)
+        return redirect(url_for('index', error=errormsg))
 
     # data for graphing (JSON format)
     bench_player_names, own_player_names = replayparser.dual_data(
