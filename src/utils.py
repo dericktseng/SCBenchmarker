@@ -1,8 +1,11 @@
 import hashlib
+import os
 import concurrent.futures
 from .constants import \
     OWN_REPLAY_TAG, \
-    BENCH_REPLAY_TAG
+    BENCH_REPLAY_TAG, \
+    SC2REPLAY
+from .config import USER_UPLOAD_FOLDER_PATH
 
 
 def get_file_hash(filedata):
@@ -55,4 +58,18 @@ def multiprocessMap(
             futures = [executor.submit(func, path) for path in lst]
         return [f.result() for f in futures]
     else:
-        return map(func, lst)
+        return [func(x) for x in lst]
+
+
+def write_replay_file(replaydata):
+    """ writes the replay to file with hash as the filename.
+    Returns the path to the written file."""
+    data = replaydata.stream.read()
+    hash = get_file_hash(data)
+    filename = os.path.join(
+        USER_UPLOAD_FOLDER_PATH,
+        hash + '.' + SC2REPLAY)
+    replaydata.close()
+    with open(filename, 'wb') as f:
+        f.write(data)
+    return filename

@@ -1,5 +1,4 @@
 import os
-from zephyrus_sc2_parser.exceptions import PlayerCountError
 from flask import \
     Flask, \
     render_template, \
@@ -8,7 +7,6 @@ from flask import \
     url_for
 
 from .config import \
-    DELTA_SECOND, \
     MULTIPROCESS, \
     MAX_WORKERS, \
     SAVED_REPLAY_FOLDER_PATH, \
@@ -22,22 +20,22 @@ from .constants import \
     INDEX_HTML, \
     ANALYZE_HTML
 
-from .utils import valid_names, get_file_hash
-from . import replayparser
+from . import utils
+from .replayparser import ReplayData
 
 app = Flask(__name__)
 
 
 @app.route('/', methods=['GET'])
 def index():
-    """Renders the index file to be served at root."""
+    """ Renders the index file to be served. """
 
     replays = os.listdir(SAVED_REPLAY_FOLDER_PATH)
     errors = request.args.get('error', default=None, type=str)
 
     # strips .SC2Replay extension from replay name
     extlength = len('.{}'.format(SC2REPLAY))
-    replays = [replay[:-extlength] for replay in replays]
+    replays = [replay[:-extlength] for replay in replays].sort()
 
     return render_template(
         INDEX_HTML,
@@ -50,9 +48,9 @@ def index():
 
 @app.route('/', methods=['POST'])
 def upload_replays():
-    """Reads the replays to be analyzed."""
+    """ Reads the replays to be analyzed. """
 
-    if not valid_names(request):
+    if not utils.valid_names(request):
         errormsg = 'Error in request name variables'
         return redirect(url_for('index', error=errormsg))
 
@@ -75,41 +73,26 @@ def upload_replays():
         return redirect(url_for('index', error=errormsg))
 
     # All cases below should be allowed
-    # saves own_replay temp copy
-    own_replay = own_replay_file.stream.read()
-    own_replay_hash = get_file_hash(own_replay)
-    own_replay_filename = os.path.join(
-        USER_UPLOAD_FOLDER_PATH,
-        own_replay_hash + '.' + SC2REPLAY)
-    own_replay_file.close()
-    with open(own_replay_filename, 'wb') as f:
-        f.write(own_replay)
+    own_replay_filename = utils.write_replay_file(own_replay_file)
 
     # name of benchmark replay filename (to pass to analyze)
     bench_replay_filename = ''
 
     # if request.form uses SAVED_REPLAYS_TAG, we use saved replays
+    # otherwise, use uploaded benchmark replay
     use_saved_replay = False
+
     if request.form:
         use_saved_replay = True
-        savedfileName = request.form.get(SAVED_REPLAYS_TAG) \
-            + "." \
-            + SC2REPLAY
-
+        savedfileName = request.form.get(SAVED_REPLAYS_TAG)
+        if not savedfileName:
+            errormsg = "Form unable to be completed. No element SAVED_REPLAYS_TAG"
+            return redirect(url_for('index', error=errormsg))
         bench_replay_filename = os.path.join(
             SAVED_REPLAY_FOLDER_PATH,
-            savedfileName)
-    # otherwise, use uploaded benchmark replay
+            savedfileName + '.' + SC2REPLAY)
     else:
-        # saves temp copy of benchmark replay
-        bench_replay = bench_replay_file.stream.read()
-        bench_replay_hash = get_file_hash(bench_replay)
-        bench_replay_filename = os.path.join(
-            USER_UPLOAD_FOLDER_PATH,
-            bench_replay_hash + '.' + SC2REPLAY)
-        bench_replay_file.close()
-        with open(bench_replay_filename, 'wb') as f:
-            f.write(bench_replay)
+        bench_replay_filename = utils.write_replay_file(bench_replay_file)
 
     analyze_url = url_for(
         'analyze',
@@ -145,58 +128,22 @@ def analyze():
         filename_own = os.path.join(USER_UPLOAD_FOLDER_PATH, filename_own)
 
     # validates the replay files as an actual replay that can be parsed.
-    bench_replay = None
-    own_replay = None
     try:
-        bench_replay, own_replay = replayparser.load_replays_as_sc2replay(
+        bench_replay_data, own_replay_data = utils.multiprocessMap(
+            ReplayData,
             [filename_bench, filename_own],
             MULTIPROCESS,
-            MAX_WORKERS,
-            DELTA_SECOND)
-    except PlayerCountError:
-        errormsg = 'Only two player replays are supported!'
-        return redirect(url_for('index', error=errormsg))
-    except Exception as e:
-        print(str(e))
-        errormsg = "Unable to read replay file. (Are you sure this is a replay?)"
+            MAX_WORKERS)
+
+    except ValueError as e:
+        errormsg = str(e)
         return redirect(url_for('index', error=errormsg))
 
-    # data for graphing (JSON format)
-    bench_player_names, own_player_names = replayparser.dual_data(
-        replayparser.get_player_names,
-        bench_replay, own_replay
-    )
-    bench_timestamps, own_timestamps = replayparser.dual_data(
-        replayparser.get_timeline_data,
-        bench_replay, own_replay
-    )
-    bench_minerals, own_minerals = replayparser.dual_data(
-        replayparser.get_mineral_data,
-        bench_replay, own_replay
-    )
-    bench_gas, own_gas = replayparser.dual_data(
-        replayparser.get_gas_data,
-        bench_replay, own_replay
-    )
-    bench_workers_produce, own_workers_produce = replayparser.dual_data(
-        replayparser.get_workers_produced,
-        bench_replay, own_replay
-    )
-    bench_supply, own_supply = replayparser.dual_data(
-        replayparser.get_total_supply,
-        bench_replay, own_replay
-    )
-    bench_build, own_build = replayparser.dual_data(
-        replayparser.get_build_order,
-        bench_replay, own_replay
-    )
+    except Exception as e:
+        errormsg = "Unable to read replay file. Error " + str(e)
+        return redirect(url_for('index', error=errormsg))
 
     return render_template(
         ANALYZE_HTML,
-        bench_players=bench_player_names, own_players=own_player_names,
-        bench_timestamps=bench_timestamps, own_timestamps=own_timestamps,
-        bench_minerals=bench_minerals, own_minerals=own_minerals,
-        bench_gas=bench_gas, own_gas=own_gas,
-        bench_workers_produce=bench_workers_produce, own_workers_produce=own_workers_produce,
-        bench_supply=bench_supply, own_supply=own_supply,
-        bench_build=bench_build, own_build=own_build)
+        bench_data = bench_replay_data,
+        own_data = own_replay_data)

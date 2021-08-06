@@ -1,40 +1,115 @@
 from sc2reader.events.game import TargetUnitCommandEvent, TargetPointCommandEvent, BasicCommandEvent
 from sc2reader.factories import SC2Factory
+from sc2reader.resources import Replay
 
 from .constants import GAME_EVENTS, TICKS_PER_SECOND, ALIASES, BLACKLIST
 from . import utils
 
 
-def load_replay_file(path_to_replay: str):
-    """ Loads the replay file defined by path_to_replay."""
-    sc2 = SC2Factory()
-    return sc2.load_replay(path_to_replay, load_level=GAME_EVENTS)
-
 
 class ReplayData():
-    """Represents the data in a replay.
+    """Represents the data in a replay. Timestamps are in seconds.
 
     instance variables:
-        build_order_timeline - list of times for the build orders
-        build_order - 
+        build_order - list of {timestamps: {elementNames: count}}
+            first in list is the build order of the first player,
+            and the second in list is the build order of the second player.
+            Example:
+            [{
+                200: { "probe": 2, "stalker": 1, ...},
+                300: { "probe": 1, "gateway": 1, ...}
+                ...
+            },
+            {
+                200: { "probe": 2, "stalker": 1},
+                300: { "probe": 1, "gateway": 1}
+                ...
+            }]
+        mineral_rate - list of dictionary of { timestamps: rate }
+            first in list is the mineral rate of the first player,
+            and the second in list is the mineral rate of the second player.
+            Example:
+            [{
+                200: 100,
+                300: 150,
+                ...
+            },
+            {
+                200: 100,
+                300: 200
+                ...
+            }]
+        gas_rate - list of dictionary of { timestamps: rate }
+            first in list is the gas rate of the first player,
+            and the second in list is the gas rate of the second player.
+            Example:
+            [{
+                200: 100,
+                300: 150,
+                ...
+            },
+            {
+                200: 100,
+                300: 200
+                ...
+            }]
+        workers_produced - list of { timestamps: workersproduced }
+            first in list is the workers produced of first player.
+            second in list is the works produced of the second player.
+            Example:
+            [{
+                15: 2,
+                17: 150,
+                ...
+            },
+            {
+                200: 100,
+                300: 200
+                ...
+            }]
+        player_names - list of player names.
+            Order should match with rest of data.
+            e.g. [ 'JohnDoe', 'RandomUser' ] should be reflected in gas_rate, etc.
     """
-    def __init__(self, path_to_replay: str):
-        replay = load_replay_file(path_to_replay)
-        self.game_event_times = None
-        self.tracker_event_times = None
-        self.player_names = None
-        self.game_events = None
 
-def get_timeline_data(replay):
-    """ Returns the times from the replay for both players"""
-    timeline = replay.timeline
-    timeline_data = dict()
-    for player in replay.players:
-        timeline_data[player] = [
-            utils.to_MM_SS(state[player]['gameloop'] / TICKS_PER_SECOND)
-            for state in timeline
-        ]
-    return timeline_data
+    def __init__(self, path_to_replay: str):
+        """ Initializes the instance variables. """
+        replay = self.__load_replay_file(path_to_replay)
+
+        self.player_names = self.__init_player_names(replay)
+        self.build_order = self.__init_build_order(replay)
+        self.mineral_rate = self.__init_mineral_rate(replay)
+        self.gas_rate = self.__init_gas_rate(replay)
+
+
+    def __load_replay_file(self, path_to_replay: str) -> Replay:
+        """ Loads the replay file with SC2Reader defined by path_to_replay."""
+        sc2 = SC2Factory()
+        return sc2.load_replay(path_to_replay, load_level=GAME_EVENTS)
+
+
+    def __init_player_names(self, replay: Replay) -> list:
+        """ returns list of player names """
+        if replay.game_type != '1v1':
+            raise ValueError('Game Type is not 1v1')
+        playernames = [None, None]
+        for team in replay.teams:
+            num = team.number # either 1 or 2
+            player = team.players[0].name if len(team.players) > 0 else None
+            playernames[num - 1] = player
+        return playernames
+
+
+    def __init_build_order(self, replay: Replay) -> list:
+        return []
+
+
+    def __init_mineral_rate(self, replay: Replay) -> list:
+        return []
+
+
+    def __init_gas_rate(self, replay: Replay) -> list:
+        return []
 
 
 def get_mineral_data(replay):
@@ -163,45 +238,3 @@ def get_build_order(replay):
 
         build_order[player] = build_order_data
     return build_order
-
-
-def get_player_names(replay):
-    """ Returns a dictionary of names with corresponding index (1 or 2)
-    e.g. {1: "MetriC", 2: "JohnDoe"}
-    """
-    players = replay.players
-    return dict([(key, players[key].name) for key in players])
-
-
-def dual_data(func, replay1, replay2):
-    """ applies function to replay1 and replay2 and returns the data lists
-    to have the same length.
-    e.g. func(replay1) = {1: [a,b,c,d,e], 2: [a,b,c,d,e]}
-         func(replay2) = {1: [1,2,3,4], 2: [1,2,3,4]}
-         returns {1: [a,b,c,d], 2: [a,b,c,d]}, {1: [1,2,3,4], 2: [1,2,3,4]}
-    """
-    data1 = func(replay1)
-    data2 = func(replay2)
-
-    """ validates data returned
-    1 & 2 of func(replay1) are same types
-    1 & 2 of func(replay2) are same types
-    types of func(replay1)[1] and func(replay2)[1] are same
-    """
-    if not isinstance(data1[1], type(data1[2])):
-        raise TypeError('Type Mismatch between data in replay1')
-    elif not isinstance(data2[1], type(data2[2])):
-        raise TypeError('Type Mismatch between data in replay2')
-    elif not isinstance(data1[1], type(data2[1])):
-        raise TypeError('Type Mismatch between data in replays')
-    elif type(data1[1]) is not list:
-        return data1, data2
-    else:
-        # trims the long data to match length of short data
-        trimmed_length = min(len(data1[1]), len(data2[1]))
-
-        # data1 and data2 should both have the same players (1 and 2)
-        for player in data1:
-            data1[player] = data1[player][:trimmed_length]
-            data2[player] = data2[player][:trimmed_length]
-        return data1, data2
