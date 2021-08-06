@@ -1,47 +1,29 @@
-from zephyrus_sc2_parser import parse_replay
-from .constants import TICKS_PER_SECOND, ALIASES, BLACKLIST
+from sc2reader.events.game import TargetUnitCommandEvent, TargetPointCommandEvent, BasicCommandEvent
+from sc2reader.factories import SC2Factory
+
+from .constants import GAME_EVENTS, TICKS_PER_SECOND, ALIASES, BLACKLIST
 from . import utils
-import concurrent.futures
 
 
-def load_replay_file(path_to_replay: str, delta_second: int):
+def load_replay_file(path_to_replay: str):
     """ Loads the replay file defined by path_to_replay."""
-    deltatick = delta_second * TICKS_PER_SECOND
-    return parse_replay(
-        path_to_replay,
-        local=True,
-        tick=deltatick)
+    sc2 = SC2Factory()
+    return sc2.load_replay(path_to_replay, load_level=GAME_EVENTS)
 
 
-def load_replays_as_sc2replay(
-        lst: list,
-        allow_multiprocess: bool,
-        max_workers: int,
-        delta_second: int):
-    """ loads in a list of paths to sc2replays, and uses
-    the zephyrus_sc2_parser on all of them to return the replay object.
+class ReplayData():
+    """Represents the data in a replay.
 
-    parameters:
-        lst - list of replay paths
-        allow_multiprocess - whether to use multiprocessing or not
-        max_workers - max number of multiprocess workers
-        delta_second - time in seconds between polls of the replay
+    instance variables:
+        build_order_timeline - list of times for the build orders
+        build_order - 
     """
-    # uses multiprocess to load in parallel.
-    if allow_multiprocess:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-            futures = [executor.submit(load_replay_file, path, delta_second) for path in lst]
-        return [f.result() for f in futures]
-    else:
-        return [load_replay_file(path, delta_second) for path in lst]
-
-
-def to_MM_SS(time_in_seconds):
-    time_in_seconds = round(time_in_seconds)
-    MM = str(time_in_seconds // 60).zfill(2)
-    SS = str(time_in_seconds % 60).zfill(2)
-    return "{}:{}".format(MM, SS)
-
+    def __init__(self, path_to_replay: str):
+        replay = load_replay_file(path_to_replay)
+        self.game_event_times = None
+        self.tracker_event_times = None
+        self.player_names = None
+        self.game_events = None
 
 def get_timeline_data(replay):
     """ Returns the times from the replay for both players"""
@@ -49,7 +31,7 @@ def get_timeline_data(replay):
     timeline_data = dict()
     for player in replay.players:
         timeline_data[player] = [
-            to_MM_SS(state[player]['gameloop'] / TICKS_PER_SECOND)
+            utils.to_MM_SS(state[player]['gameloop'] / TICKS_PER_SECOND)
             for state in timeline
         ]
     return timeline_data
