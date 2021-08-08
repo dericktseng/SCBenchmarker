@@ -13,7 +13,7 @@ def get_file_hash(filedata):
 
 
 def valid_names(request):
-    """checks whether incoming data has correct key names"""
+    """ checks whether incoming data has correct key names """
     if OWN_REPLAY_TAG not in request.files:
         return False
     elif BENCH_REPLAY_TAG not in request.files:

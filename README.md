@@ -15,6 +15,6 @@ Our instance is currently hosted at http://sc2benchmark.duckdns.org
 * A `systemctl` unit file is provided, as well as a basic `uwsgi.ini` for quick hosting setup.
 
 ## Dependencies:
-* Python3 and pip
-* Flask (and dependencies)
-* zephyrus\_sc2\_parser (and dependencies)
+* Python3
+* Flask
+* sc2reader

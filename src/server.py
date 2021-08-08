@@ -81,7 +81,6 @@ def upload_replays():
     # if request.form uses SAVED_REPLAYS_TAG, we use saved replays
     # otherwise, use uploaded benchmark replay
     use_saved_replay = False
-
     if request.form:
         use_saved_replay = True
         savedfileName = request.form.get(SAVED_REPLAYS_TAG)

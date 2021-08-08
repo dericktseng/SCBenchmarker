@@ -2,7 +2,7 @@ from sc2reader.events.game import TargetUnitCommandEvent, TargetPointCommandEven
 from sc2reader.factories import SC2Factory
 from sc2reader.resources import Replay
 
-from .constants import GAME_EVENTS, TICKS_PER_SECOND, ALIASES, BLACKLIST
+from .constants import GAME_EVENTS, ALIASES, BLACKLIST
 from . import utils
 
 
@@ -11,65 +11,72 @@ class ReplayData():
     """Represents the data in a replay. Timestamps are in seconds.
 
     instance variables:
-        build_order - list of {timestamps: {elementNames: count}}
-            first in list is the build order of the first player,
-            and the second in list is the build order of the second player.
+        build_order - dictionary of {timestamps: {elementNames: count}}
+            first in dictionary is the build order of the first player,
+            and the second in dictionary is the build order of the second player.
             Example:
-            [{
-                200: { "probe": 2, "stalker": 1, ...},
-                300: { "probe": 1, "gateway": 1, ...}
-                ...
-            },
             {
-                200: { "probe": 2, "stalker": 1},
-                300: { "probe": 1, "gateway": 1}
-                ...
-            }]
+                "JohnDoe": {
+                    200: { "probe": 2, "stalker": 1, ...},
+                    300: { "probe": 1, "gateway": 1, ...}
+                    ...
+                },
+                "RandomUser": {
+                    200: { "probe": 2, "stalker": 1},
+                    300: { "probe": 1, "gateway": 1}
+                    ...
+                }
+            }
         mineral_rate - list of dictionary of { timestamps: rate }
             first in list is the mineral rate of the first player,
             and the second in list is the mineral rate of the second player.
             Example:
-            [{
-                200: 100,
-                300: 150,
-                ...
-            },
             {
-                200: 100,
-                300: 200
-                ...
-            }]
+                "JohnDoe": {
+                    200: 100,
+                    300: 150,
+                    ...
+                },
+                "RandomUser": {
+                    200: 100,
+                    300: 200
+                    ...
+                }
+            }
         gas_rate - list of dictionary of { timestamps: rate }
             first in list is the gas rate of the first player,
             and the second in list is the gas rate of the second player.
             Example:
-            [{
-                200: 100,
-                300: 150,
-                ...
-            },
             {
-                200: 100,
-                300: 200
-                ...
-            }]
+                "JohnDoe": {
+                    200: 100,
+                    300: 150,
+                    ...
+                },
+                "RandomUser": {
+                    200: 100,
+                    300: 200
+                    ...
+                }
+            }
         workers_produced - list of { timestamps: workersproduced }
-            first in list is the workers produced of first player.
-            second in list is the works produced of the second player.
+            first in dict is the workers produced of first player.
+            second in dict is the works produced of the second player.
             Example:
-            [{
-                15: 2,
-                17: 150,
-                ...
-            },
             {
-                200: 100,
-                300: 200
-                ...
-            }]
+                "JohnDoe": {
+                    15: 2,
+                    17: 150,
+                    ...
+                },
+                "RandomUser": {
+                    200: 100,
+                    300: 200
+                    ...
+                }
+            }
         player_names - list of player names.
-            Order should match with rest of data.
-            e.g. [ 'JohnDoe', 'RandomUser' ] should be reflected in gas_rate, etc.
+            e.g. [ 'JohnDoe', 'RandomUser' ]
     """
 
     def __init__(self, path_to_replay: str):
@@ -92,24 +99,28 @@ class ReplayData():
         """ returns list of player names """
         if replay.game_type != '1v1':
             raise ValueError('Game Type is not 1v1')
-        playernames = [None, None]
+        playernames = list()
         for team in replay.teams:
-            num = team.number # either 1 or 2
-            player = team.players[0].name if len(team.players) > 0 else None
-            playernames[num - 1] = player
+            if len(team.players) > 0:
+                player = team.players[0].name
+                playernames.append(player)
         return playernames
 
 
-    def __init_build_order(self, replay: Replay) -> list:
-        return []
+    def __init_build_order(self, replay: Replay) -> dict:
+        buildOrders = dict()
+
+        for player in self.player_names:
+            buildOrders[player] = None
+        return buildOrders
 
 
-    def __init_mineral_rate(self, replay: Replay) -> list:
-        return []
+    def __init_mineral_rate(self, replay: Replay) -> dict:
+        return {}
 
 
-    def __init_gas_rate(self, replay: Replay) -> list:
-        return []
+    def __init_gas_rate(self, replay: Replay) -> dict:
+        return {}
 
 
 def get_mineral_data(replay):
