@@ -22,6 +22,10 @@ Documentation here: https://docs.python.org/3/library/concurrent.futures.html#pr
 MAX_WORKERS = 2
 
 
+""" sc2reader configurations """
+os.environ['SC2READER_CACHE_DIR'] = "/tmp"
+os.environ['SC2READER_CACHE_MAX_SIZE'] = "100"
+
 """=== Flask configuration ==="""
 
 FLASK_ENV = 'development'  # development or production
@@ -29,4 +33,3 @@ DEBUG = True
 TESTING = True
 UPLOAD_FOLDER = USER_UPLOAD_FOLDER_PATH
 SERVER_NAME = '127.0.0.1:9999'
-

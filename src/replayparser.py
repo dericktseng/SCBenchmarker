@@ -1,10 +1,10 @@
 from sc2reader.factories import SC2Factory
+
 from sc2reader.resources import Replay
 from sc2reader.objects import Participant
 
 from .constants import GAME_EVENTS, ALIASES, BLACKLIST
 from . import utils
-
 
 def pid(p: Participant) -> int:
     return p.pid
@@ -114,10 +114,10 @@ class ReplayData():
     def __init_build_order(self, replay: Replay) -> dict:
         buildFilter = lambda x: getattr(x, 'ability', False) and x.ability.is_build
         buildOrders = dict([(pid, dict()) for pid in self.players.keys()])
+        fps = replay.frames / replay.game_length.seconds
 
         for builditem in filter(buildFilter, replay.game_events):
             playerID = pid(builditem.player)
-            fps = replay.frames / replay.game_length.seconds
             timestamp = round(builditem.frame / fps)
             name = builditem.ability_name
             if timestamp not in buildOrders[playerID]:
