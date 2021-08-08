@@ -35,7 +35,8 @@ def index():
 
     # strips .SC2Replay extension from replay name
     extlength = len('.{}'.format(SC2REPLAY))
-    replays = [replay[:-extlength] for replay in replays].sort()
+    replays = [replay[:-extlength] for replay in replays]
+    replays.sort()
 
     return render_template(
         INDEX_HTML,
@@ -144,5 +145,5 @@ def analyze():
 
     return render_template(
         ANALYZE_HTML,
-        bench_data = bench_replay_data,
-        own_data = own_replay_data)
+        bench = bench_replay_data,
+        own = own_replay_data)

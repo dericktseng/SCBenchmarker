@@ -123,86 +123,62 @@ function addTagIfWorker(element, buildEntry) {
     }
 }
 
+function to_MM_SS(timestamp) {
+	var minutes = Math.floor(timestamp / 60);
+	var seconds = timestamp - minutes * 60;
+	if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+	return minutes + ":" + seconds
+}
+
 /**
  * 
  * @param {HTMLElement} target target to display on.
- * @param {Array[string]} timestamps timestamps
- * @param {Array[Dict]} buildList list of buildings, units, upgrades at every time.
+ * @param {Array[int]} timestamps timestamps
+ * @param {Dict} build list of buildings, units, upgrades at every time.
  */
-function displayBuild(target, timestamps, buildList) {
+function displayBuild(target, build) {
     // clears the frame for drawing
     target.innerText = '';
 
-    // dictionary of units, buildings, upgrades, entries at a timestamp
-    // initialized to first non-empty time disallow showing of the initial townhall and workers.
-    var prevBuildListItem = {};
-    var firstDisplayTime = 0;
-    while (Object.keys(prevBuildListItem).length == 0) {
-        prevBuildListItem = buildList[firstDisplayTime]
-        firstDisplayTime += 1
-    }
-    
-    for(let i = firstDisplayTime; i < timestamps.length; i++) {
-        // dictionary of units, buildings, upgrades, entries at a timestamp
-        var currBuildListItem = buildList[i];
-        var time = timestamps[i];
-        
-        // whether timestamp has something changing in the build
-        var validTime = false;
-
+    for(timestamp in build) {
+		var time = to_MM_SS(timestamp);
         var buildBlock = document.createElement("div");
+		var timestampElement = document.createElement("div");
+
         buildBlock.classList.add('buildBlock');
         buildBlock.classList.add(time);
+		timestampElement.classList.add('timestamp');
+		timestampElement.innerText = time;
 
         var buildEntryCount = 0;
 
-        for(buildEntry in currBuildListItem) {
-            if (buildEntry in prevBuildListItem) {
-                // difference between number of buildings/units current compared to previous
-                var diff = currBuildListItem[buildEntry] - prevBuildListItem[buildEntry];
-                if (diff > 0) {
-                    var buildElement = document.createElement("div");
-                    buildElement.innerText = buildEntry + ": " + diff;
-                    validTime = true;
-                    addTagIfWorker(buildElement, buildEntry);
-                    buildBlock.appendChild(buildElement);
-                    buildEntryCount += 1;
-                }
-            } else {
-                var buildElement = document.createElement("div");
-                buildElement.innerText = buildEntry + ": " + currBuildListItem[buildEntry];
-                validTime = true;
-                addTagIfWorker(buildElement, buildEntry);
-                buildBlock.appendChild(buildElement);
-                buildEntryCount += 1;
-            }
+        for(let buildEntry in build[timestamp]) {
+			var buildElement = document.createElement("div");
+			buildElement.innerText = buildEntry + ": " + build[timestamp][buildEntry]
+			addTagIfWorker(buildElement, buildEntry);
+			buildBlock.appendChild(buildElement);
+			buildEntryCount += 1;
         }
 
-        if (validTime) {
-            var timestampElement = document.createElement("div");
-            timestampElement.classList.add('timestamp');
-            timestampElement.innerText = timestamps[i];
-            target.appendChild(timestampElement);
-            target.appendChild(buildBlock);
-            validTime = false;
+		target.appendChild(timestampElement);
+		target.appendChild(buildBlock);
 
-            if (buildEntryCount == 1 && buildBlock.children[0].className == workerClass) {
-                buildBlock.classList.add(workerClass);
-                timestampElement.classList.add(workerClass);
-            }
-        }
-
-        prevBuildListItem = currBuildListItem;
+		if (buildEntryCount == 1 && buildBlock.children[0].className == workerClass) {
+			buildBlock.classList.add(workerClass);
+			timestampElement.classList.add(workerClass);
+		}
     }
 }
 
-function showBuild(timestamps, bench, own) {
+function showBuild(bench, own) {
     var benchElement = document.getElementById('benchmarkBuild');
     var ownElement = document.getElementById('ownBuild');
+	console.log(bench)
 
     // all of timestamp, bench, and own should have the same length:
-    displayBuild(benchElement, timestamps, bench);
-    displayBuild(ownElement, timestamps, own);
+    displayBuild(benchElement, bench);
+    displayBuild(ownElement, own);
 }
 
 function toggleWorkers(checkboxElement) {

@@ -20,8 +20,8 @@
                 <label for="benchName">Benchmark Replay</label>
                 <p><select name="benchName" id="benchName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
-                    {% for pid in bench_players %}
-                        <option value={{ pid|e }}>{{ bench_players[pid]|e }}</option>
+                    {% for pid in bench.players %}
+                        <option value={{ pid|e }}>{{ bench.players[pid]|e }}</option>
                     {% endfor %}
                 </select></p>
             </div>
@@ -30,8 +30,8 @@
                 <label for="ownName">Your Replay</label>
                 <p><select name="ownName" id="ownName" onchange="showGraphs(benchName.value, ownName.value)">
                     <option disabled selected value> -- select a player -- </option>
-                    {% for pid in own_players %}
-                        <option value={{ pid|e }}>{{ own_players[pid]|e }}</option>
+                    {% for pid in own.players %}
+                        <option value={{ pid|e }}>{{ own.players[pid]|e }}</option>
                     {% endfor %}
                 </select></p>
             </div>
@@ -77,35 +77,33 @@
             function showGraphs(benchPlayerValue, ownPlayerValue) {
                 // both values must be selected
                 if (benchPlayerValue != "" && ownPlayerValue != "") {
-                    var timestamps = {{ bench_timestamps|tojson }}[benchPlayerValue];
-
                     // minerals
-                    var benchMinerals = {{ bench_minerals|tojson }}[benchPlayerValue];
-                    ownMinerals = {{ own_minerals|tojson }}[ownPlayerValue];
+                    // var benchMinerals = {{ bench.mineral_rate|tojson }}[benchPlayerValue];
+                    // var ownMinerals = {{ own.mineral_rate|tojson }}[ownPlayerValue];
 
                     // gas
-                    var benchGas = {{ bench_gas|tojson }}[benchPlayerValue];
-                    var ownGas = {{ own_gas|tojson }}[ownPlayerValue];
+                    // var benchGas = {{ bench.gas_rate|tojson }}[benchPlayerValue];
+                    // var ownGas = {{ own.gas_rate|tojson }}[ownPlayerValue];
 
                     // workers built
-                    var benchWorkers = {{ bench_workers_produce|tojson }}[benchPlayerValue];
-                    var ownWorkers = {{ own_workers_produce|tojson }}[ownPlayerValue];
+                    // var benchWorkers = {{ bench.workers_produced|tojson }}[benchPlayerValue];
+                    // var ownWorkers = {{ own.workers_produced|tojson }}[ownPlayerValue];
 
                     // supply
-                    var benchSupply = {{ bench_supply|tojson }}[benchPlayerValue];
-                    var ownSupply = {{ own_supply|tojson }}[ownPlayerValue];
+                    // var benchSupply = {{ bench.total_supply|tojson }}[benchPlayerValue];
+                    // var ownSupply = {{ own.total_supply|tojson }}[ownPlayerValue];
 
                     // build
-                    var benchBuild = {{ bench_build|tojson }}[benchPlayerValue];
-                    var ownBuild = {{ own_build|tojson }}[ownPlayerValue];
+                    var benchBuild = {{ bench.build_order|tojson }}[benchPlayerValue];
+                    var ownBuild = {{ own.build_order|tojson }}[ownPlayerValue];
 
                     // these show functions are all contained in static/graphing.js
-                    showMineralGraph(timestamps, benchMinerals, ownMinerals);
-                    showGasGraph(timestamps, benchGas, ownGas);
-                    showWorkersGraph(timestamps, benchWorkers, ownWorkers);
-                    showSupplyGraph(timestamps, benchSupply, ownSupply);
+                    // showMineralGraph(timestamps, benchMinerals, ownMinerals);
+                    // showGasGraph(timestamps, benchGas, ownGas);
+                    // showWorkersGraph(timestamps, benchWorkers, ownWorkers);
+                    // showSupplyGraph(timestamps, benchSupply, ownSupply);
 
-                    showBuild(timestamps, benchBuild, ownBuild);
+                    showBuild(benchBuild, ownBuild);
                 }
             }
         </script>
