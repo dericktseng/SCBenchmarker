@@ -117,7 +117,8 @@ class ReplayData():
 
         for builditem in filter(buildFilter, replay.game_events):
             playerID = pid(builditem.player)
-            timestamp = builditem.second
+            fps = replay.frames / replay.game_length.seconds
+            timestamp = round(builditem.frame / fps)
             name = builditem.ability_name
             if timestamp not in buildOrders[playerID]:
                 buildOrders[playerID][timestamp] = dict()

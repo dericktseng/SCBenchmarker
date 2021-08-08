@@ -1,6 +1,3 @@
-# number of in-game ticks in one second real time
-TICKS_PER_SECOND = 22.4
-
 # level of loading required to obtain game event
 GAME_EVENTS = 4
 

@@ -174,7 +174,6 @@ function displayBuild(target, build) {
 function showBuild(bench, own) {
     var benchElement = document.getElementById('benchmarkBuild');
     var ownElement = document.getElementById('ownBuild');
-	console.log(bench)
 
     // all of timestamp, bench, and own should have the same length:
     displayBuild(benchElement, bench);
