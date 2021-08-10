@@ -12,8 +12,9 @@ def filterfunc(elem):
     return getattr(elem, 'ability', False) and elem.ability.is_build
 
 sc2 = SC2Factory()
-replay = sc2.load_replay('./saved-replays/edc3b64704d56ff6058e0b2b6383b961.SC2Replay', depth=4)
+replay = sc2.load_replay('./saved-replays/2000_Atmospharen_LE_22.SC2Replay', depth=4)
 evts = replay.events
+tevt = replay.tracker_events
 gevt = replay.game_events
 gevtf = list(filter(filterfunc, gevt))
 evtf = list(filter(filterfunc, evts))

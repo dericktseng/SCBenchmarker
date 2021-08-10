@@ -18,3 +18,8 @@ Our instance is currently hosted at http://sc2benchmark.duckdns.org
 * Python3
 * Flask
 * sc2reader
+
+## Donation
+If this project has helped you in any way, or you are feeling a bit loaded in cash, please consider donating to support my wallet-draining education as well as hosting this bot.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?business=XFQJX3EPAKEVA&no_recurring=0&currency_code=USD)
