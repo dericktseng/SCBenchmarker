@@ -1,35 +1,27 @@
 import os
+from dotenv import load_dotenv
 
-"""=== Program configurations === """
+load_dotenv()
 
 """ directory of the root of the project """
 PROJ_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
 """ path to the folder containing saved benchmark replays """
-SAVED_REPLAY_FOLDER_PATH = os.path.join(PROJ_DIR, 'saved-replays')
+SAVED_REPLAY_FOLDER_PATH = os.getenv('SAVED_FOLDER_PATH') or os.path.join(PROJ_DIR, 'saved-replays')
 
 """ path to the folder containing replays the user uploads """
-USER_UPLOAD_FOLDER_PATH = os.path.join(PROJ_DIR, 'user-replays')
-
-"""time between measuring a data point"""
-DELTA_SECOND = 2
+USER_UPLOAD_FOLDER_PATH = os.getenv('UPLOAD_FOLDER_PATH') or os.path.join(PROJ_DIR, 'user-replays')
 
 """ Allows multiprocess loading of replays. """
-MULTIPROCESS = True
+MULTIPROCESS = bool(os.getenv("MULTIPROCESS"))
 
 """ Number of workers for multiprocessing. None defaults to 61.
 Documentation here: https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor"""
-MAX_WORKERS = 2
-
-
-""" sc2reader configurations """
-os.environ['SC2READER_CACHE_DIR'] = "/tmp"
-os.environ['SC2READER_CACHE_MAX_SIZE'] = "100"
+MAX_WORKERS = os.getenv('MAX_WORKERS')
+MAX_WORKERS = int(MAX_WORKERS) if MAX_WORKERS else 2
 
 """=== Flask configuration ==="""
-
-FLASK_ENV = 'development'  # development or production
-DEBUG = True
-TESTING = True
-UPLOAD_FOLDER = USER_UPLOAD_FOLDER_PATH
-SERVER_NAME = '127.0.0.1:9999'
+FLASK_ENV = os.getenv('FLASK_ENV')
+DEBUG = bool(os.getenv('DEBUG'))
+TESTING = bool(os.getenv('TESTING'))
+SERVER_NAME = os.getenv('SERVER_NAME')

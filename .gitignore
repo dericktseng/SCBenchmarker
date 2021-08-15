@@ -4,6 +4,7 @@ saved-replays
 venv
 .venv
 .vim
+.env
 
 ### VisualStudioCode ###
 .vscode/*
