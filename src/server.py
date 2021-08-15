@@ -13,7 +13,7 @@ from .config import \
     USER_UPLOAD_FOLDER_PATH
 
 from .constants import \
-    SC2REPLAY, \
+    SC2REPLAYEXT, \
     OWN_REPLAY_TAG, \
     BENCH_REPLAY_TAG, \
     SAVED_REPLAYS_TAG, \
@@ -34,7 +34,7 @@ def index():
     errors = request.args.get('error', default=None, type=str)
 
     # strips .SC2Replay extension from replay name
-    extlength = len('.{}'.format(SC2REPLAY))
+    extlength = len(SC2REPLAYEXT)
     replays = [replay[:-extlength] for replay in replays]
     replays.sort()
 
@@ -90,7 +90,7 @@ def upload_replays():
             return redirect(url_for('index', error=errormsg))
         bench_replay_filename = os.path.join(
             SAVED_REPLAY_FOLDER_PATH,
-            savedfileName + '.' + SC2REPLAY)
+            savedfileName + SC2REPLAYEXT)
     else:
         bench_replay_filename = utils.write_replay_file(bench_replay_file)
 

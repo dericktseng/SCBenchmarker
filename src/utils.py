@@ -4,7 +4,7 @@ import concurrent.futures
 from .constants import \
     OWN_REPLAY_TAG, \
     BENCH_REPLAY_TAG, \
-    SC2REPLAY
+    SC2REPLAYEXT
 from .config import USER_UPLOAD_FOLDER_PATH
 
 
@@ -68,7 +68,7 @@ def write_replay_file(replaydata):
     hash = get_file_hash(data)
     filename = os.path.join(
         USER_UPLOAD_FOLDER_PATH,
-        hash + '.' + SC2REPLAY)
+        hash + SC2REPLAYEXT)
     replaydata.close()
     with open(filename, 'wb') as f:
         f.write(data)

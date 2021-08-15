@@ -2,7 +2,7 @@
 GAME_EVENTS = 4
 
 # file extension
-SC2REPLAY = 'SC2Replay'
+SC2REPLAYEXT = '.SC2Replay'
 
 # server constants
 FLASK_CONFIG = 'config.py'
